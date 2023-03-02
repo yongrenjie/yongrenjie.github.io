@@ -1,0 +1,15 @@
+project:
+  type: website
+
+website:
+  title: "~0.005"
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/yongrenjie
+format:
+  html:
+    theme: litera
+    css: styles.css
+

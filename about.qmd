@@ -1,0 +1,20 @@
+---
+title: "About"
+image: swan.jpeg
+about:
+  template: jolla
+  links:
+    - icon: github
+      text: "GitHub: yongrenjie"
+      href: https://github.com/yongrenjie
+
+---
+
+Hi, I'm Jon; I currently work in the [Research Engineering group](https://www.turing.ac.uk/research-engineering) at [The Alan Turing Institute](https://www.turing.ac.uk).
+I did my PhD at Oxford in chemistry, specifically NMR spectroscopy: you might know me from some of the stuff that I've done there, such as the [GENESIS website for NOAH supersequences](https://nmr-genesis.co.uk/).
+
+I'm not entirely sure why you, the reader, would be interested in what I have to write.
+I'm hardly an expert on anything (except, perhaps, my PhD area---but I've written [enough](https://doi.org/10.1038/s43586-021-00024-3) [about](https://books.rsc.org/books/edited-volume/2093/) [it](https://github.com/yongrenjie/thesis)), and there are many people whose opinions matter more.
+But, hey, why not, I guess.
+
+I'm not on social media much anymore, so there's just a solitary link to my GitHub profile.
