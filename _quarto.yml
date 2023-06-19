@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "pf"
+  title: "𝑓𝑝"
   navbar:
     right:
       - about.qmd
@@ -12,4 +12,10 @@ format:
   html:
     theme: litera
     css: styles.css
-
+    mainfont: Fira Sans
+    monofont: Fira Code
+    linestretch: 1.7
+    header-includes: |
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Fira+Sans:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
