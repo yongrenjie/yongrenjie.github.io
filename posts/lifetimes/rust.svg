@@ -8,7 +8,7 @@
    version="1.1"
    id="svg5"
    inkscape:version="1.2.2 (b0a84865, 2022-12-01)"
-   sodipodi:docname="rust1.svg"
+   sodipodi:docname="rust.svg"
    inkscape:export-filename="rust1.png"
    inkscape:export-xdpi="400"
    inkscape:export-ydpi="400"
@@ -28,12 +28,12 @@
      inkscape:document-units="mm"
      showgrid="true"
      inkscape:zoom="1.6390914"
-     inkscape:cx="265.08589"
-     inkscape:cy="447.80907"
+     inkscape:cx="359.65047"
+     inkscape:cy="397.78136"
      inkscape:window-width="1460"
      inkscape:window-height="710"
      inkscape:window-x="1570"
-     inkscape:window-y="198"
+     inkscape:window-y="170"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1">
     <inkscape:grid
@@ -581,7 +581,10 @@
      id="layer1">
     <g
        id="g2243"
-       transform="translate(-11.90625)">
+       transform="translate(-11.90625)"
+       inkscape:export-filename="./rust2.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400">
       <text
          xml:space="preserve"
          style="font-size:3.175px;fill:#892ca0;stroke:none;stroke-width:0.264583"
@@ -592,7 +595,7 @@
            id="tspan433-6-5"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#892ca0;stroke:none;stroke-width:0.264583"
            x="45.431816"
-           y="82.521103">'q</tspan></text>
+           y="82.521103">'p</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:3.175px;fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
@@ -603,7 +606,7 @@
            id="tspan433-9-3-21"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
            x="41.419098"
-           y="91.172569">'p</tspan></text>
+           y="91.172569">'q</tspan></text>
       <path
          style="fill:#892ca0;stroke:#892ca0;stroke-width:0.25;stroke-dasharray:none;marker-start:url(#RoundedArrow-6-8);marker-end:url(#marker1439-0-2)"
          d="M 35.71875,84.666667 H 59.531243"
@@ -625,7 +628,7 @@
            id="tspan433-6"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#892ca0;stroke:none;stroke-width:0.264583"
            x="95.702644"
-           y="82.521103">'q</tspan></text>
+           y="82.521103">'p</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:3.175px;fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
@@ -636,7 +639,7 @@
            id="tspan433-9-3"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
            x="91.689926"
-           y="91.172569">'p</tspan></text>
+           y="91.172569">'q</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:3.175px;fill:#808080;stroke:none;stroke-width:0.264583"
@@ -667,14 +670,14 @@
        x="88.94883"
        y="116.91693"
        id="text435-4-3"
-       inkscape:export-filename="./text435-4-3.png"
+       inkscape:export-filename="./rust3.png"
        inkscape:export-xdpi="400"
        inkscape:export-ydpi="400"><tspan
          sodipodi:role="line"
          id="tspan433-6-7"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#892ca0;stroke:none;stroke-width:0.264583"
          x="88.94883"
-         y="116.91693">'q</tspan></text>
+         y="116.91693">'p</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.175px;fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
@@ -685,7 +688,7 @@
          id="tspan433-9-3-0"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
          x="84.936111"
-         y="125.5684">'p</tspan></text>
+         y="125.5684">'q</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.175px;fill:#808080;stroke:none;stroke-width:0.264583"
@@ -734,7 +737,7 @@
          id="tspan433-6-1"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#892ca0;stroke:none;stroke-width:0.264583"
          x="153.91098"
-         y="82.521103">'q</tspan></text>
+         y="82.521103">'p</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.175px;fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
@@ -745,7 +748,7 @@
          id="tspan433-9-3-4"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
          x="149.89825"
-         y="91.172569">'p</tspan></text>
+         y="91.172569">'q</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.175px;fill:#808080;stroke:none;stroke-width:0.264583"
