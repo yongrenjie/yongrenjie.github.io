@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2023-06-19">
 
-<title>𝑓𝑝 - Lifetime bounds in Rust</title>
+<title>𝑓𝑝 - Lifetime annotations in Rust</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -139,7 +139,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Lifetime bounds in Rust</h1>
+      <h1 class="title">Lifetime annotations in Rust</h1>
                                 <div class="quarto-categories">
                 <div class="quarto-category">rust</div>
               </div>
@@ -174,7 +174,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><em>Disclaimer</em>: I don’t actually write Rust for anything, and the following is <em>entirely</em> based on my interpretation of <em>one single paragraph in the Rust book</em>, so I may be completely wrong.</p>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>At today’s Rust reading group we were discussing lifetimes. Up until now, most of the features covered in the Rust book are very similar to those in Haskell (e.g.&nbsp;pattern matching, traits which map to typeclasses, etc.), so I’ve been feeling reasonably comfortable. But lifetimes are something very alien to me.</p>
+<p>At today’s Rust reading group we were discussing lifetimes. Most of the features covered in the Rust book until now (such as pattern matching, algebraic data types, traits, and generics) are directly analogous to concepts in Haskell, so I’ve been feeling reasonably comfortable. But lifetimes are something very alien to me.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
 <p>If you don’t think about it too hard, the standard example given in <a href="https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html#lifetime-annotations-in-function-signatures">Section 10.3 of the Rust book</a> seems <em>almost</em> self-evident. I added a few comments (in lines 10, 13, and 15), specifying the ‘true’ lifetimes of <code>x</code>, <code>y</code>, and <code>result</code> as <code>'p</code>, and <code>'q</code>, and <code>'r</code> respectively, to make the following discussion clearer. (You can use the <a href="https://play.rust-lang.org/">Rust playground</a> to execute the code snippets.)</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">fn</span> longest<span class="op">&lt;</span><span class="ot">'a</span><span class="op">&gt;</span>(x<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span><span class="op">,</span> y<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span>) <span class="op">-&gt;</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span> <span class="op">{</span></span>
 <span id="cb1-2"><a href="#cb1-2"></a>    <span class="cf">if</span> x<span class="op">.</span>len() <span class="op">&gt;</span> y<span class="op">.</span>len() <span class="op">{</span></span>
@@ -200,22 +200,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The <code>longest</code> function definition specifying that all the references in the signature must have the same lifetime <code>'a</code></p>
 </blockquote>
 <p>It is not really obvious how this is true, because <code>string1</code> and <code>string2</code> certainly do not have the same lifetime.</p>
-<p>In fact, if we think about lifetimes in the same way we do generics, then it is not clear how the function can even be called with two arguments that do not have the same lifetime.</p>
+<p>In fact, if we think about lifetimes in the same way we do types, then it is not clear how the function can even be called with two arguments that do not have the same lifetime. For example, the following would obviously fail the function <code>fst</code> requires that <code>x</code> and <code>y</code> have the same type (which they do not):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">fn</span> fst<span class="op">&lt;</span>T<span class="op">&gt;</span>(x<span class="op">:</span> T<span class="op">,</span> y<span class="op">:</span> T) <span class="op">-&gt;</span> T <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>    x</span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="op">}</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>    <span class="kw">let</span> x <span class="op">=</span> <span class="dv">1</span><span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="kw">let</span> y <span class="op">=</span> <span class="st">"errrrr"</span><span class="op">;</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>    <span class="kw">let</span> z <span class="op">=</span> fst(x<span class="op">,</span> y)<span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="lifetime-semantics" class="level2">
 <h2 class="anchored" data-anchor-id="lifetime-semantics">Lifetime semantics</h2>
-<p>The resolution to this seeming contradiction is that the lifetime <code>'a</code> passed in is not the lifetime of <code>string1</code>, nor is it the lifetime of <code>string2</code>. <em>It is an entirely separate lifetime which the compiler determines, based on the lifetimes of the two arguments</em>. This is expanded upon in a later paragraph, which in my opinion is the key to understanding all of this:</p>
+<p>The resolution to this seeming contradiction is that the lifetime <code>'a</code> passed in is not the lifetime of <code>string1</code>, nor is it the lifetime of <code>string2</code>. <em>It is an entirely separate lifetime which the compiler determines, based on the lifetimes of the two arguments</em>. This is expanded upon in later paragraphs, which in my opinion are the key to understanding all of this:</p>
 <blockquote class="blockquote">
-<p>When we pass concrete references to <code>longest</code>, the concrete lifetime that is substituted for <code>'a</code> is the part of the scope of <code>x</code> that overlaps with the scope of <code>y.</code> In other words, the generic lifetime <code>'a</code> will get the concrete lifetime that is equal to the smaller of the lifetimes of <code>x</code> and <code>y.</code> Because we’ve annotated the returned reference with the same lifetime parameter <code>'a,</code> the returned reference will also be valid for the length of the smaller of the lifetimes of <code>x</code> and <code>y</code>.</p>
+<p>Remember, when we specify the lifetime parameters in this function signature, we’re not changing the lifetimes of any values passed in or returned. […] When we pass concrete references to <code>longest</code>, the concrete lifetime that is substituted for <code>'a</code> is the part of the scope of <code>x</code> that overlaps with the scope of <code>y</code>. In other words, the generic lifetime <code>'a</code> will get the concrete lifetime that is equal to the smaller of the lifetimes of <code>x</code> and <code>y</code>. Because we’ve annotated the returned reference with the same lifetime parameter <code>'a,</code> the returned reference will also be valid for the length of the smaller of the lifetimes of <code>x</code> and <code>y</code>.</p>
 </blockquote>
-<p>So, the compiler has to find a concrete value for <code>'a</code> which is valid for both <code>x</code> and <code>y</code>. That is to say, the compiler has to conjure up a new lifetime <code>'a</code> which is a subset of both the <em>true</em> lifetimes <code>'p</code> and <code>'q</code>. If it is not possible to do this, then the compiler should complain. Of course, since the two true lifetimes overlap with each other, the compiler can choose <code>'a</code> to be the smaller of the two, which happily satisfies the requirement above.</p>
+<p>So, the compiler has to find a concrete value for <code>'a</code> which is valid for both <code>x</code> and <code>y</code>—it must be a subset of both the <em>true</em> lifetimes <code>'p</code> and <code>'q</code>. If it is not possible to do this, then the compiler should complain.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Of course, since the two true lifetimes overlap with each other, the compiler can choose <code>'a</code> to be the smaller of the two, which happily satisfies the requirement above.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./rust1.png" class="img-fluid figure-img" width="482"></p>
 <figcaption class="figure-caption">Resolving the lifetime parameters in <code>longest</code>, step 1.</figcaption>
 </figure>
 </div>
-<p>(If you’re mathsy, you might like to think of this as an existential quantifier: the compiler must prove that there exists some lifetime <code>'a</code> such that <code>'a</code> ≤&nbsp;<code>'p</code> and <code>'a</code> ≤ <code>'q</code>.)</p>
 <p>Notice that we haven’t considered the lifetime of the return value yet, <code>'r</code>. This is because the return lifetime is not used to calculate what <code>'a</code> should be. Instead, once the compiler has calculated <code>'a</code>, it then assigns this lifetime to <code>'r</code>. It must then check that the return value is not used outside of this lifetime.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
@@ -227,40 +235,41 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol type="1">
 <li><p><em>The compiler cannot find a lifetime <code>'a</code> which satisfies all input variables.</em> I have not yet been able to come up with an example of this. (Suggestions are welcome.)</p></li>
 <li><p><em>The lifetime <code>'a</code> is found, but the return value is used outside of this.</em> An example of this is provided in Listing 10-23 of the Rust book:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>    <span class="kw">let</span> string1 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"long string is long"</span>)<span class="op">;</span></span>
-<span id="cb2-3"><a href="#cb2-3"></a>    <span class="kw">let</span> result<span class="op">;</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a>    <span class="op">{</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>        <span class="kw">let</span> string2 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"xyz"</span>)<span class="op">;</span></span>
-<span id="cb2-6"><a href="#cb2-6"></a>        result <span class="op">=</span> longest(string1<span class="op">.</span>as_str()<span class="op">,</span> string2<span class="op">.</span>as_str())<span class="op">;</span></span>
-<span id="cb2-7"><a href="#cb2-7"></a>    <span class="op">}</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a>    <span class="pp">println!</span>(<span class="st">"The longest string is {}"</span><span class="op">,</span> result)<span class="op">;</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>    <span class="kw">let</span> string1 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"long string is long"</span>)<span class="op">;</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>    <span class="kw">let</span> result<span class="op">;</span></span>
+<span id="cb3-4"><a href="#cb3-4"></a>    <span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>        <span class="kw">let</span> string2 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"xyz"</span>)<span class="op">;</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>        result <span class="op">=</span> longest(string1<span class="op">.</span>as_str()<span class="op">,</span> string2<span class="op">.</span>as_str())<span class="op">;</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>    <span class="op">}</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>    <span class="pp">println!</span>(<span class="st">"The longest string is {}"</span><span class="op">,</span> result)<span class="op">;</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol>
 </section>
 <section id="lifetime-bounds" class="level2">
 <h2 class="anchored" data-anchor-id="lifetime-bounds">Lifetime bounds</h2>
-<p>With this understanding of the simple example, we can now tackle a slightly more complicated one, which came up during the reading group. This one uses so-called <a href="https://doc.rust-lang.org/reference/trait-bounds.html#lifetime-bounds"><em>‘lifetime bounds’</em></a>: the <code>'b: 'a</code> syntax in the function signature stipulates that the lifetime <code>'b</code> must be at least as long as the lifetime <code>'a</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">fn</span> longest2<span class="op">&lt;</span><span class="ot">'a</span><span class="op">,</span> <span class="ot">'b</span><span class="op">:</span> <span class="ot">'a</span><span class="op">&gt;</span>(x<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span><span class="op">,</span> y<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'b</span> <span class="dt">str</span>) <span class="op">-&gt;</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span> <span class="op">{</span></span>
-<span id="cb3-2"><a href="#cb3-2"></a>    <span class="cf">if</span> x<span class="op">.</span>len() <span class="op">&gt;</span> y<span class="op">.</span>len() <span class="op">{</span></span>
-<span id="cb3-3"><a href="#cb3-3"></a>        x</span>
-<span id="cb3-4"><a href="#cb3-4"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
-<span id="cb3-5"><a href="#cb3-5"></a>        y</span>
-<span id="cb3-6"><a href="#cb3-6"></a>    <span class="op">}</span></span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="op">}</span></span>
-<span id="cb3-8"><a href="#cb3-8"></a></span>
-<span id="cb3-9"><a href="#cb3-9"></a><span class="kw">fn</span> main () <span class="op">{</span></span>
-<span id="cb3-10"><a href="#cb3-10"></a>    <span class="co">// longer lifetime, let's call this 'p</span></span>
-<span id="cb3-11"><a href="#cb3-11"></a>    <span class="kw">let</span> string1 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"long string is long"</span>)<span class="op">;</span></span>
-<span id="cb3-12"><a href="#cb3-12"></a>    <span class="op">{</span></span>
-<span id="cb3-13"><a href="#cb3-13"></a>        <span class="co">// shorter lifetime, let's call this 'q</span></span>
-<span id="cb3-14"><a href="#cb3-14"></a>        <span class="kw">let</span> string2 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"xyz"</span>)<span class="op">;</span></span>
-<span id="cb3-15"><a href="#cb3-15"></a>        <span class="kw">let</span> result <span class="op">=</span> longest2(string1<span class="op">.</span>as_str()<span class="op">,</span> string2<span class="op">.</span>as_str())<span class="op">;</span></span>
-<span id="cb3-16"><a href="#cb3-16"></a>        <span class="pp">println!</span>(<span class="st">"The longest2 string is {}"</span><span class="op">,</span> result)<span class="op">;</span></span>
-<span id="cb3-17"><a href="#cb3-17"></a>    <span class="op">};</span></span>
-<span id="cb3-18"><a href="#cb3-18"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>With this understanding of the basic example, we can now tackle a slightly more complicated one, which came up during the reading group. This one uses so-called <a href="https://doc.rust-lang.org/reference/trait-bounds.html#lifetime-bounds"><em>‘lifetime bounds’</em></a>: the <code>'b: 'a</code> syntax in the function signature stipulates that the lifetime <code>'b</code> must be at least as long as the lifetime <code>'a</code>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb4-1"><a href="#cb4-1"></a><span class="kw">fn</span> longest2<span class="op">&lt;</span><span class="ot">'a</span><span class="op">,</span> <span class="ot">'b</span><span class="op">:</span> <span class="ot">'a</span><span class="op">&gt;</span>(x<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span><span class="op">,</span> y<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'b</span> <span class="dt">str</span>) <span class="op">-&gt;</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>    <span class="cf">if</span> x<span class="op">.</span>len() <span class="op">&gt;</span> y<span class="op">.</span>len() <span class="op">{</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>        x</span>
+<span id="cb4-4"><a href="#cb4-4"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>        y</span>
+<span id="cb4-6"><a href="#cb4-6"></a>    <span class="op">}</span></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="op">}</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a></span>
+<span id="cb4-9"><a href="#cb4-9"></a><span class="kw">fn</span> main () <span class="op">{</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>    <span class="co">// longer lifetime, let's call this 'p</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>    <span class="kw">let</span> string1 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"long string is long"</span>)<span class="op">;</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a>    <span class="op">{</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a>        <span class="co">// shorter lifetime, let's call this 'q</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a>        <span class="kw">let</span> string2 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"xyz"</span>)<span class="op">;</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a>        <span class="co">// lifetime of the result, let's call this 'r</span></span>
+<span id="cb4-16"><a href="#cb4-16"></a>        <span class="kw">let</span> result <span class="op">=</span> longest2(string1<span class="op">.</span>as_str()<span class="op">,</span> string2<span class="op">.</span>as_str())<span class="op">;</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a>        <span class="pp">println!</span>(<span class="st">"The longest2 string is {}"</span><span class="op">,</span> result)<span class="op">;</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a>    <span class="op">};</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Since the <em>true lifetimes</em> of the variables are such that<code>'q</code> &lt; <code>'p</code>, it is not clear why the compiler should accept this. After all, the function signature seems to suggest that the second parameter must outlive the first.</p>
-<p>However, the entire point is that <code>'a</code> and <code>'b</code> are not the same as <code>'p</code> and <code>'q</code>; they are new lifetimes which are conjured up by the compiler. Going along the lines of the discussion above, the compiler must now find two lifetimes <code>'a</code> and <code>'b</code> which satisfy the following constraints:</p>
+<p>However, the entire point is that <code>'a</code> and <code>'b</code> are not the same as <code>'p</code> and <code>'q</code>; they are new lifetimes which are determined by the compiler. Going along the lines of the discussion above, the compiler must now find two lifetimes <code>'a</code> and <code>'b</code> which satisfy the following constraints:</p>
 <ol type="1">
 <li><code>'a</code> ≤ <code>'p</code> (because of the first parameter)</li>
 <li><code>'b</code> ≤&nbsp;<code>'q</code> (because of the second parameter)</li>
@@ -270,7 +279,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./rust3.png" class="img-fluid figure-img" width="143"></p>
-<figcaption class="figure-caption">A resolution for the lifetime parameters in <code>longest2</code>.</figcaption>
+<figcaption class="figure-caption">A happy resolution for the lifetime parameters in <code>longest2</code>.</figcaption>
 </figure>
 </div>
 </section>
@@ -287,13 +296,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The requirements for <code>longest</code> are that we must find a lifetime <code>'c</code> (different letter chosen to avoid clashes) for which <code>'c</code> ≤ <code>'p</code> and <code>'c</code> ≤&nbsp;<code>'q</code>. If we just choose <code>'c</code> to be equal to <code>'a</code>, we are done.</p></li>
 </ul>
 <p>Collectively, this means that any combination of <em>inputs</em> that forms a valid call to <code>longest</code> will also form a valid call to <code>longest2</code>, and <em>vice versa</em>.</p>
-<p>However, there’s also the <em>return value</em> to consider. In theory, it could be possible that the values returned by <code>longest</code> and <code>longest2</code> might have different lifetimes, and thus it would be possible to use a value obtained from <code>longest</code> in a location where using a value from <code>longest2</code> would lead to an error (or <em>vice versa</em>)..</p>
-<p>To be clear, I don’t actually think this is the case. Intuitively, it seems to me that the return value <code>'r</code> in both cases should simply the intersection of the true lifetimes <code>'p</code> and <code>'q</code>); but I haven’t actually proven this.</p>
+<p>The catch is that there’s also a lifetime for the <em>return value</em> to consider. In theory, it could be possible that the values returned by <code>longest</code> and <code>longest2</code> might have different lifetimes, and thus it would be possible to use a value obtained from <code>longest</code> in a location where using a value from <code>longest2</code> would lead to an error (or <em>vice versa</em>).</p>
+<p>To be clear, I don’t actually think this is the case. Intuitively, it seems to me that the return lifetime <code>'r</code> should be resolved to the same value in both cases, namely the intersection of the true lifetimes <code>'p</code> and <code>'q</code>; but I haven’t actually proven this. One for another post, perhaps…</p>
 
 
 </section>
 
-</main> <!-- /main -->
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Haskell is garbage-collected.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>In other words, this is an <em>existential quantifier</em>: the compiler must prove that there exists some lifetime <code>'a</code> such that <code>'a</code> ≤&nbsp;<code>'p</code> and <code>'a</code> ≤ <code>'q</code>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
