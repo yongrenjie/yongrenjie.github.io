@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="dcterms.date" content="2023-06-19">
+
+<title>𝑓𝑝 - Lifetime bounds in Rust</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&amp;family=Fira+Sans:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">𝑓𝑝</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/yongrenjie" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Lifetime bounds in Rust</h1>
+                                <div class="quarto-categories">
+                <div class="quarto-category">rust</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 19, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p><em>Disclaimer</em>: I don’t actually write Rust for anything, and the following is <em>entirely</em> based on my interpretation of <em>one single paragraph in the Rust book</em>, so I may be completely wrong.</p>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>At today’s Rust reading group we were discussing lifetimes. Up until now, most of the features covered in the Rust book are very similar to those in Haskell (e.g.&nbsp;pattern matching, traits which map to typeclasses, etc.), so I’ve been feeling reasonably comfortable. But lifetimes are something very alien to me.</p>
+<p>If you don’t think about it too hard, the standard example given in <a href="https://doc.rust-lang.org/book/ch10-03-lifetime-syntax.html#lifetime-annotations-in-function-signatures">Section 10.3 of the Rust book</a> seems <em>almost</em> self-evident. I added a few comments (in lines 10, 13, and 15), specifying the ‘true’ lifetimes of <code>x</code>, <code>y</code>, and <code>result</code> as <code>'p</code>, and <code>'q</code>, and <code>'r</code> respectively, to make the following discussion clearer. (You can use the <a href="https://play.rust-lang.org/">Rust playground</a> to execute the code snippets.)</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">fn</span> longest<span class="op">&lt;</span><span class="ot">'a</span><span class="op">&gt;</span>(x<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span><span class="op">,</span> y<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span>) <span class="op">-&gt;</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>    <span class="cf">if</span> x<span class="op">.</span>len() <span class="op">&gt;</span> y<span class="op">.</span>len() <span class="op">{</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>        x</span>
+<span id="cb1-4"><a href="#cb1-4"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb1-5"><a href="#cb1-5"></a>        y</span>
+<span id="cb1-6"><a href="#cb1-6"></a>    <span class="op">}</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="op">}</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="kw">fn</span> main () <span class="op">{</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>    <span class="co">// longer lifetime, let's call this 'p</span></span>
+<span id="cb1-11"><a href="#cb1-11"></a>    <span class="kw">let</span> string1 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"long string is long"</span>)<span class="op">;</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a>    <span class="op">{</span></span>
+<span id="cb1-13"><a href="#cb1-13"></a>        <span class="co">// shorter lifetime, let's call this 'q</span></span>
+<span id="cb1-14"><a href="#cb1-14"></a>        <span class="kw">let</span> string2 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"xyz"</span>)<span class="op">;</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a>        <span class="co">// lifetime of the result, let's call this 'r</span></span>
+<span id="cb1-16"><a href="#cb1-16"></a>        <span class="kw">let</span> result <span class="op">=</span> longest(string1<span class="op">.</span>as_str()<span class="op">,</span> string2<span class="op">.</span>as_str())<span class="op">;</span></span>
+<span id="cb1-17"><a href="#cb1-17"></a>        <span class="pp">println!</span>(<span class="st">"The longest string is {}"</span><span class="op">,</span> result)<span class="op">;</span></span>
+<span id="cb1-18"><a href="#cb1-18"></a>    <span class="op">};</span></span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Unfortunately, I found some aspects of the book a little bit confusing. For example, the caption of Listing 10-21 (where <code>longest()</code> is defined) says:</p>
+<blockquote class="blockquote">
+<p>The <code>longest</code> function definition specifying that all the references in the signature must have the same lifetime <code>'a</code></p>
+</blockquote>
+<p>It is not really obvious how this is true, because <code>string1</code> and <code>string2</code> certainly do not have the same lifetime.</p>
+<p>In fact, if we think about lifetimes in the same way we do generics, then it is not clear how the function can even be called with two arguments that do not have the same lifetime.</p>
+</section>
+<section id="lifetime-semantics" class="level2">
+<h2 class="anchored" data-anchor-id="lifetime-semantics">Lifetime semantics</h2>
+<p>The resolution to this seeming contradiction is that the lifetime <code>'a</code> passed in is not the lifetime of <code>string1</code>, nor is it the lifetime of <code>string2</code>. <em>It is an entirely separate lifetime which the compiler determines, based on the lifetimes of the two arguments</em>. This is expanded upon in a later paragraph, which in my opinion is the key to understanding all of this:</p>
+<blockquote class="blockquote">
+<p>When we pass concrete references to <code>longest</code>, the concrete lifetime that is substituted for <code>'a</code> is the part of the scope of <code>x</code> that overlaps with the scope of <code>y.</code> In other words, the generic lifetime <code>'a</code> will get the concrete lifetime that is equal to the smaller of the lifetimes of <code>x</code> and <code>y.</code> Because we’ve annotated the returned reference with the same lifetime parameter <code>'a,</code> the returned reference will also be valid for the length of the smaller of the lifetimes of <code>x</code> and <code>y</code>.</p>
+</blockquote>
+<p>So, the compiler has to find a concrete value for <code>'a</code> which is valid for both <code>x</code> and <code>y</code>. That is to say, the compiler has to conjure up a new lifetime <code>'a</code> which is a subset of both the <em>true</em> lifetimes <code>'p</code> and <code>'q</code>. If it is not possible to do this, then the compiler should complain. Of course, since the two true lifetimes overlap with each other, the compiler can choose <code>'a</code> to be the smaller of the two, which happily satisfies the requirement above.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./rust1.png" class="img-fluid figure-img" width="482"></p>
+<figcaption class="figure-caption">Resolving the lifetime parameters in <code>longest</code>, step 1.</figcaption>
+</figure>
+</div>
+<p>(If you’re mathsy, you might like to think of this as an existential quantifier: the compiler must prove that there exists some lifetime <code>'a</code> such that <code>'a</code> ≤&nbsp;<code>'p</code> and <code>'a</code> ≤ <code>'q</code>.)</p>
+<p>Notice that we haven’t considered the lifetime of the return value yet, <code>'r</code>. This is because the return lifetime is not used to calculate what <code>'a</code> should be. Instead, once the compiler has calculated <code>'a</code>, it then assigns this lifetime to <code>'r</code>. It must then check that the return value is not used outside of this lifetime.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./rust2.png" class="img-fluid figure-img" width="800"></p>
+<figcaption class="figure-caption">Resolving the lifetime parameters in <code>longest</code>, step 2.</figcaption>
+</figure>
+</div>
+<p>I suppose, then, that for a function with annotated lifetimes, there are two ways in which the compiler may complain:</p>
+<ol type="1">
+<li><p><em>The compiler cannot find a lifetime <code>'a</code> which satisfies all input variables.</em> I have not yet been able to come up with an example of this. (Suggestions are welcome.)</p></li>
+<li><p><em>The lifetime <code>'a</code> is found, but the return value is used outside of this.</em> An example of this is provided in Listing 10-23 of the Rust book:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb2-1"><a href="#cb2-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>    <span class="kw">let</span> string1 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"long string is long"</span>)<span class="op">;</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>    <span class="kw">let</span> result<span class="op">;</span></span>
+<span id="cb2-4"><a href="#cb2-4"></a>    <span class="op">{</span></span>
+<span id="cb2-5"><a href="#cb2-5"></a>        <span class="kw">let</span> string2 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"xyz"</span>)<span class="op">;</span></span>
+<span id="cb2-6"><a href="#cb2-6"></a>        result <span class="op">=</span> longest(string1<span class="op">.</span>as_str()<span class="op">,</span> string2<span class="op">.</span>as_str())<span class="op">;</span></span>
+<span id="cb2-7"><a href="#cb2-7"></a>    <span class="op">}</span></span>
+<span id="cb2-8"><a href="#cb2-8"></a>    <span class="pp">println!</span>(<span class="st">"The longest string is {}"</span><span class="op">,</span> result)<span class="op">;</span></span>
+<span id="cb2-9"><a href="#cb2-9"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+</ol>
+</section>
+<section id="lifetime-bounds" class="level2">
+<h2 class="anchored" data-anchor-id="lifetime-bounds">Lifetime bounds</h2>
+<p>With this understanding of the simple example, we can now tackle a slightly more complicated one, which came up during the reading group. This one uses so-called <a href="https://doc.rust-lang.org/reference/trait-bounds.html#lifetime-bounds"><em>‘lifetime bounds’</em></a>: the <code>'b: 'a</code> syntax in the function signature stipulates that the lifetime <code>'b</code> must be at least as long as the lifetime <code>'a</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">fn</span> longest2<span class="op">&lt;</span><span class="ot">'a</span><span class="op">,</span> <span class="ot">'b</span><span class="op">:</span> <span class="ot">'a</span><span class="op">&gt;</span>(x<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span><span class="op">,</span> y<span class="op">:</span> <span class="op">&amp;</span><span class="ot">'b</span> <span class="dt">str</span>) <span class="op">-&gt;</span> <span class="op">&amp;</span><span class="ot">'a</span> <span class="dt">str</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>    <span class="cf">if</span> x<span class="op">.</span>len() <span class="op">&gt;</span> y<span class="op">.</span>len() <span class="op">{</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>        x</span>
+<span id="cb3-4"><a href="#cb3-4"></a>    <span class="op">}</span> <span class="cf">else</span> <span class="op">{</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>        y</span>
+<span id="cb3-6"><a href="#cb3-6"></a>    <span class="op">}</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a><span class="op">}</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a></span>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="kw">fn</span> main () <span class="op">{</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>    <span class="co">// longer lifetime, let's call this 'p</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>    <span class="kw">let</span> string1 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"long string is long"</span>)<span class="op">;</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a>    <span class="op">{</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a>        <span class="co">// shorter lifetime, let's call this 'q</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a>        <span class="kw">let</span> string2 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"xyz"</span>)<span class="op">;</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a>        <span class="kw">let</span> result <span class="op">=</span> longest2(string1<span class="op">.</span>as_str()<span class="op">,</span> string2<span class="op">.</span>as_str())<span class="op">;</span></span>
+<span id="cb3-16"><a href="#cb3-16"></a>        <span class="pp">println!</span>(<span class="st">"The longest2 string is {}"</span><span class="op">,</span> result)<span class="op">;</span></span>
+<span id="cb3-17"><a href="#cb3-17"></a>    <span class="op">};</span></span>
+<span id="cb3-18"><a href="#cb3-18"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Since the <em>true lifetimes</em> of the variables are such that<code>'q</code> &lt; <code>'p</code>, it is not clear why the compiler should accept this. After all, the function signature seems to suggest that the second parameter must outlive the first.</p>
+<p>However, the entire point is that <code>'a</code> and <code>'b</code> are not the same as <code>'p</code> and <code>'q</code>; they are new lifetimes which are conjured up by the compiler. Going along the lines of the discussion above, the compiler must now find two lifetimes <code>'a</code> and <code>'b</code> which satisfy the following constraints:</p>
+<ol type="1">
+<li><code>'a</code> ≤ <code>'p</code> (because of the first parameter)</li>
+<li><code>'b</code> ≤&nbsp;<code>'q</code> (because of the second parameter)</li>
+<li><code>'b</code> ≥&nbsp;<code>'a</code> (because of the lifetime bound)</li>
+</ol>
+<p>One can see that if we instantiate <em>both</em> lifetimes <code>'a</code> and <code>'b</code> as being equal to <code>'q</code>, then all three of these requirements are met.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./rust3.png" class="img-fluid figure-img" width="143"></p>
+<figcaption class="figure-caption">A resolution for the lifetime parameters in <code>longest2</code>.</figcaption>
+</figure>
+</div>
+</section>
+<section id="is-longest2-more-restrictive" class="level2">
+<h2 class="anchored" data-anchor-id="is-longest2-more-restrictive">Is <code>longest2</code> more restrictive?</h2>
+<p>With this knowledge, we might now consider whether there any possible cases in which using <code>longest2</code> will raise a compiler error, while <code>longest</code> compiles just fine. (Or <em>vice versa</em>!)</p>
+<p>My inclination is <em>no</em>: in other words, I think <code>longest</code> and <code>longest2</code> are entirely equivalent. My proof is only halfway there, though.</p>
+<ul>
+<li><p><strong>If we can satisfy the function signature for <code>longest</code>, then we can satisfy that for <code>longest2</code>.</strong></p>
+<p>If we have a valid call to <code>longest</code>, that means that there exists some lifetime <code>'a</code> which satisfies both <code>'a</code> ≤ <code>'p</code> and <code>'a</code> ≤ <code>'q'</code>.</p>
+<p>If we then switch this call to one of <code>longest2</code>, we need to find a new lifetime <code>'b</code> which obeys the three requirements above, namely: <code>'a</code> ≤ <code>'p</code>, <code>'b</code> ≤&nbsp;<code>'q</code>, and <code>'b</code> ≥&nbsp;<code>'a</code>. The first of these is already satisfied, and we can satisfy the other two by simply choosing <code>'b</code> to be equal to <code>'a</code>, making the call to <code>longest2</code> also valid.</p></li>
+<li><p><strong>If we can satisfy the function signature for <code>longest2</code>, then we can satisfy that for <code>longest</code>.</strong></p>
+<p>If we have a valid call to <code>longest2</code>, then there exists two lifetimes <code>'a</code> and <code>'b</code> which satisfy <code>'a</code> ≤ <code>'p</code>, <code>'b</code> ≤&nbsp;<code>'q</code>, and <code>'b</code> ≥&nbsp;<code>'a</code>.</p>
+<p>The requirements for <code>longest</code> are that we must find a lifetime <code>'c</code> (different letter chosen to avoid clashes) for which <code>'c</code> ≤ <code>'p</code> and <code>'c</code> ≤&nbsp;<code>'q</code>. If we just choose <code>'c</code> to be equal to <code>'a</code>, we are done.</p></li>
+</ul>
+<p>Collectively, this means that any combination of <em>inputs</em> that forms a valid call to <code>longest</code> will also form a valid call to <code>longest2</code>, and <em>vice versa</em>.</p>
+<p>However, there’s also the <em>return value</em> to consider. In theory, it could be possible that the values returned by <code>longest</code> and <code>longest2</code> might have different lifetimes, and thus it would be possible to use a value obtained from <code>longest</code> in a location where using a value from <code>longest2</code> would lead to an error (or <em>vice versa</em>)..</p>
+<p>To be clear, I don’t actually think this is the case. Intuitively, it seems to me that the return value <code>'r</code> in both cases should simply the intersection of the true lifetimes <code>'p</code> and <code>'q</code>); but I haven’t actually proven this.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
