@@ -7,6 +7,8 @@ engine: knitr
 
 *Disclaimer*: I don't actually write Rust for anything, and the following is *entirely* based on my interpretation of *one single paragraph in the Rust book*, so I may be completely wrong.
 
+(Edited 20 June after some discussion at work. Thanks to everyone who chimed in and helped me to understand this better!)
+
 ## Introduction
 
 At today's Rust reading group we were discussing lifetimes.
@@ -73,37 +75,38 @@ This is expanded upon in later paragraphs, which in my opinion are the key to un
 > Because we’ve annotated the returned reference with the same lifetime parameter `'a,` the returned reference will also be valid for the length of the smaller of the lifetimes of `x` and `y`.
 
 So, the compiler has to find a concrete value for `'a` which is valid for both `x` and `y`---it must be a subset of both the *true* lifetimes `'p` and `'q`.
-If it is not possible to do this, then the compiler should complain.[^2]
-Of course, since the two true lifetimes overlap with each other, the compiler can choose `'a` to be the smaller of the two, which happily satisfies the requirement above.
 
-  ![Resolving the lifetime parameters in `longest`, step 1.](./rust1.png){width=482}
+On top of that, the compiler must also ensure that this lifetime `'a` is valid wherever the return value is being used.
+In other words, we must have `'a` ≥ `'r`.
 
-Notice that we haven't considered the lifetime of the return value yet, `'r`.
-This is because the return lifetime is not used to calculate what `'a` should be.
-Instead, once the compiler has calculated `'a`, it then assigns this lifetime to `'r`.
-It must then check that the return value is not used outside of this lifetime.
+If it is not possible to satisfy all of these conditions, then the compiler should complain.[^2]
+Of course, it is not very hard to find a suitable value for `'a` in this particular case:
 
-  ![Resolving the lifetime parameters in `longest`, step 2.](./rust2.png){width=800}
+  ![Resolving the lifetime parameters in `longest`.](./rust1.png){width=482}
 
-I suppose, then, that for a function with annotated lifetimes, there are two ways in which the compiler may complain:
+In this very simple case, the constraints above essentially reduce to `min('p', 'q') ≥ 'r'`.[^3]
+This is what the book means when it says:
 
-1. *The compiler cannot find a lifetime `'a` which satisfies all input variables.*
-   I have not yet been able to come up with an example of this. (Suggestions are welcome.)
+> In practice, it means that the lifetime of the reference returned by the `longest` function is the same as the smaller of the lifetimes of the values referred to by the function arguments.
 
-2. *The lifetime `'a` is found, but the return value is used outside of this.*
-   An example of this is provided in Listing 10-23 of the Rust book:
+This also explains why the following snippet (Listing 10-23 in the book) fails to compile.
+At a high level, we can understand this as the return value `result` being used outside of the scope of `string2`.
 
-    ```{.rust code-line-numbers="true"}
-    fn main() {
-        let string1 = String::from("long string is long");
-        let result;
-        {
-            let string2 = String::from("xyz");
-            result = longest(string1.as_str(), string2.as_str());
-        }
-        println!("The longest string is {}", result);
+However, it would be more precise to say that this is because the compiler cannot find a concrete lifetime `'a` which simultaneously satisfies all three constraints `'a` ≤ `'p`, `'a` ≤ `'q`, and `'a` ≥ `'r`.
+
+```{.rust code-line-numbers="true"}
+fn main() {
+    let string1 = String::from("long string is long");
+    let result;
+    {
+        let string2 = String::from("xyz");
+        result = longest(string1.as_str(), string2.as_str());
     }
-    ```
+    println!("The longest string is {}", result);
+}
+```
+
+![An occasion where the lifetime parameters cannot be resolved.](./rust2.png){width=450}
 
 ## Lifetime bounds
 
@@ -136,11 +139,12 @@ Since the *true lifetimes* of the variables are such that`'q` < `'p`, it is not 
 After all, the function signature seems to suggest that the second parameter must outlive the first.
 
 However, the entire point is that `'a` and `'b` are not the same as `'p` and `'q`; they are new lifetimes which are determined by the compiler.
-Going along the lines of the discussion above, the compiler must now find two lifetimes `'a` and `'b` which satisfy the following constraints:
+Going along the lines of the discussion above, the compiler must now find two lifetimes `'a` and `'b` which together satisfy the following constraints:
 
 1. `'a` ≤ `'p` (because of the first parameter)
 2. `'b` ≤ `'q` (because of the second parameter)
 3. `'b` ≥ `'a` (because of the lifetime bound)
+4. `'a` ≥ `'r` (because of the return value)
 
 One can see that if we instantiate *both* lifetimes `'a` and `'b` as being equal to `'q`, then all three of these requirements are met.
 
@@ -151,32 +155,28 @@ One can see that if we instantiate *both* lifetimes `'a` and `'b` as being equal
 With this knowledge, we might now consider whether there any possible cases in which using `longest2` will raise a compiler error, while `longest` compiles just fine.
 (Or *vice versa*!)
 
-My inclination is *no*: in other words, I think `longest` and `longest2` are entirely equivalent.
-My proof is only halfway there, though.
+I think not, because:
 
 - **If we can satisfy the function signature for `longest`, then we can satisfy that for `longest2`.**
 
-  If we have a valid call to `longest`, that means that there exists some lifetime `'a` which satisfies both `'a` ≤ `'p` and `'a` ≤ `'q'`.
+  If we have a valid call to `longest`, that means that there already exists some lifetime `'a` which satisfies `'a` ≤ `'p`, `'a` ≤ `'q'`, and `'a` ≥ `'r`.
 
-  If we then switch this call to one of `longest2`, we need to find a new lifetime `'b` which obeys the three requirements above, namely: `'a` ≤ `'p`, `'b` ≤ `'q`, and `'b` ≥ `'a`.
-  The first of these is already satisfied, and we can satisfy the other two by simply choosing `'b` to be equal to `'a`, making the call to `longest2` also valid.
+  If we then switch this call to one of `longest2`, we need to find a new lifetime `'b` which obeys the four requirements above, namely: `'a` ≤ `'p`, `'b` ≤ `'q`, `'b` ≥ `'a`, and `'a` ≥ `'r`.
+  
+  The first and last of these are already satisfied, and we can satisfy the other two by simply choosing `'b` to be equal to `'a`, making the call to `longest2` also valid.
 
 - **If we can satisfy the function signature for `longest2`, then we can satisfy that for `longest`.**
 
-  If we have a valid call to `longest2`, then there exists two lifetimes `'a` and `'b` which satisfy `'a` ≤ `'p`, `'b` ≤ `'q`, and `'b` ≥ `'a`.
+  If we have a valid call to `longest2`, then there exist two lifetimes `'a` and `'b` which satisfy `'a` ≤ `'p`, `'b` ≤ `'q`, `'b` ≥ `'a`, and `'a` ≥ `'r`.
 
-  The requirements for `longest` are that we must find a lifetime `'c` (different letter chosen to avoid clashes) for which `'c` ≤ `'p` and `'c` ≤ `'q`.
+  The requirements for `longest` are that we must find a lifetime `'c` (different letter chosen to avoid clashes) for which `'c` ≤ `'p`, `'c` ≤ `'q`, and `'c` ≥ `'r`.
   If we just choose `'c` to be equal to `'a`, we are done.
 
-Collectively, this means that any combination of *inputs* that forms a valid call to `longest` will also form a valid call to `longest2`, and *vice versa*.
+Collectively, this means that any valid call to `longest` can be replaced with a valid call to `longest2` (and *vice versa*).
 
-The catch is that there's also a lifetime for the *return value* to consider.
-In theory, it could be possible that the values returned by `longest` and `longest2` might have different lifetimes, and thus it would be possible to use a value obtained from `longest` in a location where using a value from `longest2` would lead to an error (or *vice versa*).
-
-To be clear, I don't actually think this is the case.
-Intuitively, it seems to me that the return lifetime `'r` should be resolved to the same value in both cases, namely the intersection of the true lifetimes `'p` and `'q`; but I haven't actually proven this.
-One for another post, perhaps...
 
 [^1]: Haskell is garbage-collected.
 
 [^2]: In other words, this is an *existential quantifier*: the compiler must prove that there exists some lifetime `'a` such that `'a` ≤ `'p` and `'a` ≤ `'q`.
+
+[^3]: Perhaps we should talk about the *intersection* of `'p` and `'q`, rather than the minimum. But in this case, they are the same thing.
