@@ -172,6 +172,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p><em>Disclaimer</em>: I don’t actually write Rust for anything, and the following is <em>entirely</em> based on my interpretation of <em>one single paragraph in the Rust book</em>, so I may be completely wrong.</p>
+<p>(Edited 20 June after some discussion at work. Thanks to everyone who chimed in and helped me to understand this better!)</p>
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p>At today’s Rust reading group we were discussing lifetimes. Most of the features covered in the Rust book until now (such as pattern matching, algebraic data types, traits, and generics) are directly analogous to concepts in Haskell, so I’ve been feeling reasonably comfortable. But lifetimes are something very alien to me.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
@@ -217,24 +218,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Remember, when we specify the lifetime parameters in this function signature, we’re not changing the lifetimes of any values passed in or returned. […] When we pass concrete references to <code>longest</code>, the concrete lifetime that is substituted for <code>'a</code> is the part of the scope of <code>x</code> that overlaps with the scope of <code>y</code>. In other words, the generic lifetime <code>'a</code> will get the concrete lifetime that is equal to the smaller of the lifetimes of <code>x</code> and <code>y</code>. Because we’ve annotated the returned reference with the same lifetime parameter <code>'a,</code> the returned reference will also be valid for the length of the smaller of the lifetimes of <code>x</code> and <code>y</code>.</p>
 </blockquote>
-<p>So, the compiler has to find a concrete value for <code>'a</code> which is valid for both <code>x</code> and <code>y</code>—it must be a subset of both the <em>true</em> lifetimes <code>'p</code> and <code>'q</code>. If it is not possible to do this, then the compiler should complain.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Of course, since the two true lifetimes overlap with each other, the compiler can choose <code>'a</code> to be the smaller of the two, which happily satisfies the requirement above.</p>
+<p>So, the compiler has to find a concrete value for <code>'a</code> which is valid for both <code>x</code> and <code>y</code>—it must be a subset of both the <em>true</em> lifetimes <code>'p</code> and <code>'q</code>.</p>
+<p>On top of that, the compiler must also ensure that this lifetime <code>'a</code> is valid wherever the return value is being used. In other words, we must have <code>'a</code> ≥&nbsp;<code>'r</code>.</p>
+<p>If it is not possible to satisfy all of these conditions, then the compiler should complain.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> Of course, it is not very hard to find a suitable value for <code>'a</code> in this particular case:</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="./rust1.png" class="img-fluid figure-img" width="482"></p>
-<figcaption class="figure-caption">Resolving the lifetime parameters in <code>longest</code>, step 1.</figcaption>
+<figcaption class="figure-caption">Resolving the lifetime parameters in <code>longest</code>.</figcaption>
 </figure>
 </div>
-<p>Notice that we haven’t considered the lifetime of the return value yet, <code>'r</code>. This is because the return lifetime is not used to calculate what <code>'a</code> should be. Instead, once the compiler has calculated <code>'a</code>, it then assigns this lifetime to <code>'r</code>. It must then check that the return value is not used outside of this lifetime.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="./rust2.png" class="img-fluid figure-img" width="800"></p>
-<figcaption class="figure-caption">Resolving the lifetime parameters in <code>longest</code>, step 2.</figcaption>
-</figure>
-</div>
-<p>I suppose, then, that for a function with annotated lifetimes, there are two ways in which the compiler may complain:</p>
-<ol type="1">
-<li><p><em>The compiler cannot find a lifetime <code>'a</code> which satisfies all input variables.</em> I have not yet been able to come up with an example of this. (Suggestions are welcome.)</p></li>
-<li><p><em>The lifetime <code>'a</code> is found, but the return value is used outside of this.</em> An example of this is provided in Listing 10-23 of the Rust book:</p>
+<p>In this very simple case, the constraints above essentially reduce to <code>min('p', 'q') ≥ 'r'</code>.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> This is what the book means when it says:</p>
+<blockquote class="blockquote">
+<p>In practice, it means that the lifetime of the reference returned by the <code>longest</code> function is the same as the smaller of the lifetimes of the values referred to by the function arguments.</p>
+</blockquote>
+<p>This also explains why the following snippet (Listing 10-23 in the book) fails to compile. At a high level, we can understand this as the return value <code>result</code> being used outside of the scope of <code>string2</code>.</p>
+<p>However, it would be more precise to say that this is because the compiler cannot find a concrete lifetime <code>'a</code> which simultaneously satisfies all three constraints <code>'a</code> ≤ <code>'p</code>, <code>'a</code> ≤ <code>'q</code>, and <code>'a</code> ≥ <code>'r</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode numberSource rust number-lines code-with-copy"><code class="sourceCode rust"><span id="cb3-1"><a href="#cb3-1"></a><span class="kw">fn</span> main() <span class="op">{</span></span>
 <span id="cb3-2"><a href="#cb3-2"></a>    <span class="kw">let</span> string1 <span class="op">=</span> <span class="dt">String</span><span class="pp">::</span>from(<span class="st">"long string is long"</span>)<span class="op">;</span></span>
 <span id="cb3-3"><a href="#cb3-3"></a>    <span class="kw">let</span> result<span class="op">;</span></span>
@@ -243,8 +241,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-6"><a href="#cb3-6"></a>        result <span class="op">=</span> longest(string1<span class="op">.</span>as_str()<span class="op">,</span> string2<span class="op">.</span>as_str())<span class="op">;</span></span>
 <span id="cb3-7"><a href="#cb3-7"></a>    <span class="op">}</span></span>
 <span id="cb3-8"><a href="#cb3-8"></a>    <span class="pp">println!</span>(<span class="st">"The longest string is {}"</span><span class="op">,</span> result)<span class="op">;</span></span>
-<span id="cb3-9"><a href="#cb3-9"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-</ol>
+<span id="cb3-9"><a href="#cb3-9"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./rust2.png" class="img-fluid figure-img" width="450"></p>
+<figcaption class="figure-caption">An occasion where the lifetime parameters cannot be resolved.</figcaption>
+</figure>
+</div>
 </section>
 <section id="lifetime-bounds" class="level2">
 <h2 class="anchored" data-anchor-id="lifetime-bounds">Lifetime bounds</h2>
@@ -269,11 +272,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-18"><a href="#cb4-18"></a>    <span class="op">};</span></span>
 <span id="cb4-19"><a href="#cb4-19"></a><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Since the <em>true lifetimes</em> of the variables are such that<code>'q</code> &lt; <code>'p</code>, it is not clear why the compiler should accept this. After all, the function signature seems to suggest that the second parameter must outlive the first.</p>
-<p>However, the entire point is that <code>'a</code> and <code>'b</code> are not the same as <code>'p</code> and <code>'q</code>; they are new lifetimes which are determined by the compiler. Going along the lines of the discussion above, the compiler must now find two lifetimes <code>'a</code> and <code>'b</code> which satisfy the following constraints:</p>
+<p>However, the entire point is that <code>'a</code> and <code>'b</code> are not the same as <code>'p</code> and <code>'q</code>; they are new lifetimes which are determined by the compiler. Going along the lines of the discussion above, the compiler must now find two lifetimes <code>'a</code> and <code>'b</code> which together satisfy the following constraints:</p>
 <ol type="1">
 <li><code>'a</code> ≤ <code>'p</code> (because of the first parameter)</li>
 <li><code>'b</code> ≤&nbsp;<code>'q</code> (because of the second parameter)</li>
 <li><code>'b</code> ≥&nbsp;<code>'a</code> (because of the lifetime bound)</li>
+<li><code>'a</code> ≥&nbsp;<code>'r</code> (because of the return value)</li>
 </ol>
 <p>One can see that if we instantiate <em>both</em> lifetimes <code>'a</code> and <code>'b</code> as being equal to <code>'q</code>, then all three of these requirements are met.</p>
 <div class="quarto-figure quarto-figure-center">
@@ -286,18 +290,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="is-longest2-more-restrictive" class="level2">
 <h2 class="anchored" data-anchor-id="is-longest2-more-restrictive">Is <code>longest2</code> more restrictive?</h2>
 <p>With this knowledge, we might now consider whether there any possible cases in which using <code>longest2</code> will raise a compiler error, while <code>longest</code> compiles just fine. (Or <em>vice versa</em>!)</p>
-<p>My inclination is <em>no</em>: in other words, I think <code>longest</code> and <code>longest2</code> are entirely equivalent. My proof is only halfway there, though.</p>
+<p>I think not, because:</p>
 <ul>
 <li><p><strong>If we can satisfy the function signature for <code>longest</code>, then we can satisfy that for <code>longest2</code>.</strong></p>
-<p>If we have a valid call to <code>longest</code>, that means that there exists some lifetime <code>'a</code> which satisfies both <code>'a</code> ≤ <code>'p</code> and <code>'a</code> ≤ <code>'q'</code>.</p>
-<p>If we then switch this call to one of <code>longest2</code>, we need to find a new lifetime <code>'b</code> which obeys the three requirements above, namely: <code>'a</code> ≤ <code>'p</code>, <code>'b</code> ≤&nbsp;<code>'q</code>, and <code>'b</code> ≥&nbsp;<code>'a</code>. The first of these is already satisfied, and we can satisfy the other two by simply choosing <code>'b</code> to be equal to <code>'a</code>, making the call to <code>longest2</code> also valid.</p></li>
+<p>If we have a valid call to <code>longest</code>, that means that there already exists some lifetime <code>'a</code> which satisfies <code>'a</code> ≤ <code>'p</code>, <code>'a</code> ≤ <code>'q'</code>, and <code>'a</code> ≥&nbsp;<code>'r</code>.</p>
+<p>If we then switch this call to one of <code>longest2</code>, we need to find a new lifetime <code>'b</code> which obeys the four requirements above, namely: <code>'a</code> ≤ <code>'p</code>, <code>'b</code> ≤&nbsp;<code>'q</code>, <code>'b</code> ≥&nbsp;<code>'a</code>, and <code>'a</code> ≥&nbsp;<code>'r</code>.</p>
+<p>The first and last of these are already satisfied, and we can satisfy the other two by simply choosing <code>'b</code> to be equal to <code>'a</code>, making the call to <code>longest2</code> also valid.</p></li>
 <li><p><strong>If we can satisfy the function signature for <code>longest2</code>, then we can satisfy that for <code>longest</code>.</strong></p>
-<p>If we have a valid call to <code>longest2</code>, then there exists two lifetimes <code>'a</code> and <code>'b</code> which satisfy <code>'a</code> ≤ <code>'p</code>, <code>'b</code> ≤&nbsp;<code>'q</code>, and <code>'b</code> ≥&nbsp;<code>'a</code>.</p>
-<p>The requirements for <code>longest</code> are that we must find a lifetime <code>'c</code> (different letter chosen to avoid clashes) for which <code>'c</code> ≤ <code>'p</code> and <code>'c</code> ≤&nbsp;<code>'q</code>. If we just choose <code>'c</code> to be equal to <code>'a</code>, we are done.</p></li>
+<p>If we have a valid call to <code>longest2</code>, then there exist two lifetimes <code>'a</code> and <code>'b</code> which satisfy <code>'a</code> ≤ <code>'p</code>, <code>'b</code> ≤&nbsp;<code>'q</code>, <code>'b</code> ≥&nbsp;<code>'a</code>, and <code>'a</code> ≥&nbsp;<code>'r</code>.</p>
+<p>The requirements for <code>longest</code> are that we must find a lifetime <code>'c</code> (different letter chosen to avoid clashes) for which <code>'c</code> ≤ <code>'p</code>, <code>'c</code> ≤&nbsp;<code>'q</code>, and <code>'c</code> ≥&nbsp;<code>'r</code>. If we just choose <code>'c</code> to be equal to <code>'a</code>, we are done.</p></li>
 </ul>
-<p>Collectively, this means that any combination of <em>inputs</em> that forms a valid call to <code>longest</code> will also form a valid call to <code>longest2</code>, and <em>vice versa</em>.</p>
-<p>The catch is that there’s also a lifetime for the <em>return value</em> to consider. In theory, it could be possible that the values returned by <code>longest</code> and <code>longest2</code> might have different lifetimes, and thus it would be possible to use a value obtained from <code>longest</code> in a location where using a value from <code>longest2</code> would lead to an error (or <em>vice versa</em>).</p>
-<p>To be clear, I don’t actually think this is the case. Intuitively, it seems to me that the return lifetime <code>'r</code> should be resolved to the same value in both cases, namely the intersection of the true lifetimes <code>'p</code> and <code>'q</code>; but I haven’t actually proven this. One for another post, perhaps…</p>
+<p>Collectively, this means that any valid call to <code>longest</code> can be replaced with a valid call to <code>longest2</code> (and <em>vice versa</em>).</p>
 
 
 </section>
@@ -308,6 +311,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <ol>
 <li id="fn1"><p>Haskell is garbage-collected.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 <li id="fn2"><p>In other words, this is an <em>existential quantifier</em>: the compiler must prove that there exists some lifetime <code>'a</code> such that <code>'a</code> ≤&nbsp;<code>'p</code> and <code>'a</code> ≤ <code>'q</code>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Perhaps we should talk about the <em>intersection</em> of <code>'p</code> and <code>'q</code>, rather than the minimum. But in this case, they are the same thing.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section></div></main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
