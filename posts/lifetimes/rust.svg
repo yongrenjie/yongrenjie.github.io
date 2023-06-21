@@ -27,13 +27,13 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.4553859"
-     inkscape:cx="59.090857"
-     inkscape:cy="405.39077"
+     inkscape:zoom="1.4607813"
+     inkscape:cx="116.37608"
+     inkscape:cy="491.51778"
      inkscape:window-width="1661"
      inkscape:window-height="794"
-     inkscape:window-x="1658"
-     inkscape:window-y="44"
+     inkscape:window-x="1529"
+     inkscape:window-y="155"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1">
     <inkscape:grid
@@ -373,7 +373,7 @@
        orient="auto-start-reverse"
        inkscape:stockid="RoundedArrow"
        markerWidth="6.1347523"
-       markerHeight="5.9304953"
+       markerHeight="5.9304948"
        viewBox="0 0 6.1347524 5.9304951"
        inkscape:isstock="true"
        inkscape:collect="always"
@@ -479,6 +479,139 @@
          style="fill:context-stroke;fill-rule:evenodd;stroke:none"
          id="path1437-9-6-7-2-6" />
     </marker>
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow-6-8-8"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="RoundedArrow"
+       markerWidth="6.1347523"
+       markerHeight="5.9304953"
+       viewBox="0 0 6.1347524 5.9304951"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1367-3-6-8" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker1439-0-2-7"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="RoundedArrow"
+       markerWidth="6.1347523"
+       markerHeight="5.9304953"
+       viewBox="0 0 6.1347524 5.9304951"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1437-8-5-1" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow-7-4-1-93"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="RoundedArrow"
+       markerWidth="6.1347523"
+       markerHeight="5.9304953"
+       viewBox="0 0 6.1347524 5.9304951"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1367-0-0-3-1" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker1439-3-4-9-1"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="RoundedArrow"
+       markerWidth="6.1347523"
+       markerHeight="5.9304953"
+       viewBox="0 0 6.1347524 5.9304951"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1437-9-6-73-4" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="RoundedArrow-7-4-0-0-6-7-9"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="RoundedArrow"
+       markerWidth="6.1347523"
+       markerHeight="5.9304953"
+       viewBox="0 0 6.1347524 5.9304951"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1367-0-0-9-0-6-9-5" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="marker1439-3-4-3-8-5-3-9"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="RoundedArrow"
+       markerWidth="6.1347523"
+       markerHeight="5.9304953"
+       viewBox="0 0 6.1347524 5.9304951"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         transform="scale(0.7)"
+         d="m -0.21114562,-4.1055728 6.42229122,3.21114561 a 1,1 90 0 1 0,1.78885438 L -0.21114562,4.1055728 A 1.236068,1.236068 31.717474 0 1 -2,3 v -6 a 1.236068,1.236068 148.28253 0 1 1.78885438,-1.1055728 z"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         id="path1437-9-6-7-3-4-8-0" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Arrow1L-8"
+       refX="0"
+       refY="0"
+       orient="auto-start-reverse"
+       inkscape:stockid="Arrow1L"
+       markerWidth="8.75"
+       markerHeight="5"
+       viewBox="0 0 8.75 5"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid">
+      <path
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         id="arrow1L-4"
+         transform="scale(-0.5)" />
+    </marker>
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -487,8 +620,8 @@
     <text
        xml:space="preserve"
        style="font-size:3.175px;fill:#892ca0;stroke:none;stroke-width:0.264583"
-       x="88.94883"
-       y="116.91693"
+       x="36.032166"
+       y="175.31107"
        id="text435-4-3"
        inkscape:export-filename="./rust3.png"
        inkscape:export-xdpi="400"
@@ -496,48 +629,51 @@
          sodipodi:role="line"
          id="tspan433-6-7"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#892ca0;stroke:none;stroke-width:0.264583"
-         x="88.94883"
-         y="116.91693">'p</tspan></text>
+         x="36.032166"
+         y="175.31107">'p</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.175px;fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="84.936111"
-       y="125.5684"
+       x="32.019447"
+       y="183.96252"
        id="text435-3-4-9"><tspan
          sodipodi:role="line"
          id="tspan433-9-3-0"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
-         x="84.936111"
-         y="125.5684">'q</tspan></text>
+         x="32.019447"
+         y="183.96252">'q</tspan></text>
     <text
        xml:space="preserve"
        style="font-size:3.175px;fill:#808080;stroke:none;stroke-width:0.264583"
-       x="84.744804"
-       y="132.23631"
+       x="31.828138"
+       y="190.63045"
        id="text435-3-4-7-2"><tspan
          sodipodi:role="line"
          id="tspan433-9-3-2-3"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#808080;stroke:none;stroke-width:0.264583"
-         x="84.744804"
-         y="132.23631">'a</tspan></text>
+         x="31.828138"
+         y="190.63045">'a</tspan></text>
     <path
        style="fill:#892ca0;stroke:#892ca0;stroke-width:0.25;stroke-dasharray:none;marker-start:url(#RoundedArrow-6-7);marker-end:url(#marker1439-0-3)"
-       d="M 79.235771,119.0625 H 103.04827"
+       d="M 26.319105,177.45663 H 50.131604"
        id="path541-84-9" />
     <path
        style="fill:#892ca0;stroke:#d400aa;stroke-width:0.25;stroke-dasharray:none;marker-start:url(#RoundedArrow-7-4-02);marker-end:url(#marker1439-3-4-8)"
-       d="M 79.235771,121.70833 H 95.110768"
+       d="M 26.319105,180.10246 H 42.194102"
        id="path541-8-0-9" />
     <path
        style="fill:#808080;stroke:#808080;stroke-width:0.25;stroke-dasharray:none;marker-start:url(#RoundedArrow-7-4-0-9);marker-end:url(#marker1439-3-4-3-2)"
-       d="M 79.235773,128.32291 H 95.110768"
+       d="M 26.319107,186.71704 H 42.194102"
        id="path541-8-0-5-7" />
     <text
        xml:space="preserve"
        style="font-size:3.175px;fill:#808080;stroke:none;stroke-width:0.264583"
        x="91.498619"
        y="103.13216"
-       id="text435-3-4-7-2-1"><tspan
+       id="text435-3-4-7-2-1"
+       inkscape:export-filename="./rust1.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400"><tspan
          sodipodi:role="line"
          id="tspan433-9-3-2-3-2"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#808080;stroke:none;stroke-width:0.264583"
@@ -550,17 +686,17 @@
     <text
        xml:space="preserve"
        style="font-size:3.175px;fill:#808080;stroke:none;stroke-width:0.264583"
-       x="84.884033"
-       y="138.85091"
+       x="31.967367"
+       y="197.24504"
        id="text435-3-4-7-2-6"><tspan
          sodipodi:role="line"
          id="tspan433-9-3-2-3-5"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#808080;stroke:none;stroke-width:0.264583"
-         x="84.884033"
-         y="138.85091">'b</tspan></text>
+         x="31.967367"
+         y="197.24504">'b</tspan></text>
     <path
        style="fill:#808080;stroke:#808080;stroke-width:0.25;stroke-dasharray:none;marker-start:url(#RoundedArrow-7-4-0-9-0);marker-end:url(#marker1439-3-4-3-2-9)"
-       d="M 79.375,134.9375 H 95.249995"
+       d="M 26.458334,193.33163 H 42.333329"
        id="path541-8-0-5-7-7" />
     <g
        id="g2933">
@@ -708,6 +844,101 @@
    id="tspan1280">'r</tspan> </tspan></text>
     <text
        xml:space="preserve"
+       style="font-size:3.175px;fill:#892ca0;stroke:none;stroke-width:0.264583"
+       x="29.625647"
+       y="117.84404"
+       id="text435-4-7-4"
+       inkscape:export-filename="./rust2.png"
+       inkscape:export-xdpi="400"
+       inkscape:export-ydpi="400"><tspan
+         sodipodi:role="line"
+         id="tspan433-6-5-74"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#892ca0;stroke:none;stroke-width:0.264583"
+         x="29.625647"
+         y="117.84404">'p</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="25.563255"
+       y="126.49551"
+       id="text435-3-4-0-18"><tspan
+         sodipodi:role="line"
+         id="tspan433-9-3-21-58"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#d400aa;fill-opacity:1;stroke:none;stroke-width:0.264583"
+         x="25.563255"
+         y="126.49551">'q</tspan></text>
+    <path
+       style="fill:#892ca0;stroke:#892ca0;stroke-width:0.251326;stroke-dasharray:none;marker-start:url(#RoundedArrow-6-8-8);marker-end:url(#marker1439-0-2-7)"
+       d="M 19.84375,119.98961 H 43.909527"
+       id="path541-84-8-9" />
+    <path
+       style="fill:#892ca0;stroke:#d400aa;stroke-width:0.25;stroke-dasharray:none;marker-start:url(#RoundedArrow-7-4-1-93);marker-end:url(#marker1439-3-4-9-1)"
+       d="M 19.83116,122.63544 H 35.706153"
+       id="path541-8-0-7-9" />
+    <text
+       xml:space="preserve"
+       style="font-size:3.175px;fill:#447821;stroke:none;stroke-width:0.264583"
+       x="28.23127"
+       y="133.0842"
+       id="text435-3-4-7-3-1-0-9"><tspan
+         sodipodi:role="line"
+         id="tspan433-9-3-2-7-7-2-3"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code Bold';fill:#447821;stroke:none;stroke-width:0.264583"
+         x="28.23127"
+         y="133.0842">'r</tspan></text>
+    <path
+       style="fill:#447821;stroke:#447821;stroke-width:0.282682;stroke-dasharray:none;marker-start:url(#RoundedArrow-7-4-0-0-6-7-9);marker-end:url(#marker1439-3-4-3-8-5-3-9)"
+       d="M 20.341934,129.11837 H 40.638872"
+       id="path541-8-0-5-2-1-4-3" />
+    <path
+       style="fill:#892ca0;stroke:#11002b;stroke-width:0.335844;stroke-dasharray:none;marker-end:url(#Arrow1L-8);marker-mid:"
+       d="M 47.751639,125.28128 H 76.400608"
+       id="path1893-0" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:3.175px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans Medium';fill:#11002b;stroke:none;stroke-width:0.125"
+       x="62.561543"
+       y="110.95567"
+       id="text391-4"><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans';text-align:center;text-anchor:middle;stroke:none;stroke-width:0.125"
+         x="62.561543"
+         y="110.95567"
+         id="tspan553-0">compiler chooses</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans';text-align:center;text-anchor:middle;stroke:none;stroke-width:0.125"
+         x="62.561543"
+         y="114.92442"
+         id="tspan2640-5"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';text-align:center;text-anchor:middle"
+   id="tspan2650-6">'a </tspan>such that</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans';text-align:center;text-anchor:middle;stroke:none;stroke-width:0.125"
+         x="62.561543"
+         y="118.98577"
+         id="tspan2656-8"><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';fill:#892ca0;fill-opacity:1"
+   id="tspan2658-5">'a<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans';fill:#892ca0;fill-opacity:1"
+   id="tspan2661-3"> ≤ </tspan>'p</tspan>, <tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';fill:#d400aa;fill-opacity:1"
+   id="tspan2644-7">'a<tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans';fill:#d400aa;fill-opacity:1"
+   id="tspan2663-6"> ≤ </tspan>'q</tspan>,</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans';text-align:center;text-anchor:middle;stroke:none;stroke-width:0.125"
+         x="62.982227"
+         y="123.04713"
+         id="tspan1276-8"
+         dx="0 0 0 0 0 0 0 0 -0.086150646">and <tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';fill:#447821;fill-opacity:1"
+   id="tspan1278-6">'a</tspan><tspan
+   style="fill:#447821;fill-opacity:1"
+   id="tspan2229-7"> ≥ </tspan><tspan
+   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';fill:#447821;fill-opacity:1"
+   id="tspan1280-1">'r</tspan> </tspan></text>
+    <text
+       xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';text-align:center;text-anchor:middle;fill:#ffffff;stroke:#000080;stroke-width:0.280001"
        x="68.791664"
        y="84.666664"
@@ -715,5 +946,51 @@
          sodipodi:role="line"
          id="tspan2017"
          style="stroke-width:0.28"></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';text-align:center;text-anchor:middle;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.280001"
+       x="68.791664"
+       y="139.83336"
+       id="text4960"><tspan
+         sodipodi:role="line"
+         id="tspan4958"
+         style="stroke-width:0.28;fill:none;stroke:#000000"
+         x="68.791664"
+         y="139.83336" /></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';text-align:center;text-anchor:middle;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.280001"
+       x="55.5625"
+       y="142.47919"
+       id="text5176"><tspan
+         sodipodi:role="line"
+         id="tspan5174"
+         style="stroke-width:0.28"
+         x="55.5625"
+         y="142.47919" /></text>
+    <g
+       id="g12856"
+       transform="matrix(0.50000038,0,0,0.50000038,34.682906,57.348926)"
+       style="stroke-width:0.799999;stroke-dasharray:none">
+      <path
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.799999;stroke-dasharray:none"
+         d="m 55.562499,134.54169 2.645834,2.64583"
+         id="path5281" />
+      <path
+         style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.799999;stroke-dasharray:none"
+         d="m 55.562499,137.18752 2.645834,-2.64583"
+         id="path5283" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:3.175px;font-family:'Fira Code';-inkscape-font-specification:'Fira Code';text-align:center;text-anchor:middle;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.4;stroke-dasharray:none"
+       x="90.574829"
+       y="126.17663"
+       id="text12860"><tspan
+         sodipodi:role="line"
+         id="tspan12858"
+         style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Fira Sans';-inkscape-font-specification:'Fira Sans Italic';fill:#ff0000;stroke:none;stroke-width:0.4"
+         x="90.574829"
+         y="126.17663">not possible</tspan></text>
   </g>
 </svg>
