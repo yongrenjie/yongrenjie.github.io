@@ -1,0 +1,30 @@
+---
+title: "Pulse programming in TopSpin"
+date: 2023-07-23
+image: img/hsqc.png
+categories: [nmr, pulse programming]
+---
+
+You're starting a PhD or undergrad project on NMR spectroscopy, and you're going to be writing your own pulse sequences... which is great!
+This series of posts aims to be a gentle introduction to constructing and running pulse programmes, which is complementary to TopSpin's reference manual.
+
+# Table of contents
+
+ - [Part 0](part0.qmd): Prerequisites
+ - [Part 1](part1.qmd): Getting started with TopSpin
+ - [Part 2](part2.qmd): A basic pulse–acquire sequence
+ - [Part 3](part3.qmd): Running the experiment
+ - [Part 4](part4.qmd): Dummy scans and parameter descriptions
+ - [Part 5](part5.qmd): Using mathematical expressions
+ - [Part 6](part6.qmd): Gradients
+ - [Part 7](part7.qmd): A consolidation exercise
+
+# A little bit of history
+
+These posts were in fact written in 2021, when I was doing my PhD at Oxford.
+I have, however, set the post date to 2023 so that it doesn't appear at the bottom of my blog.
+These used to be hosted on the Foroozandeh group blog, but I've since migrated them over to my own blog.
+
+They are *not* complete in any way!
+When I wrote these, I had really intended to cover quite a lot of material, especially 2D NMR, which was a huge part of my PhD work.
+However, time got in the way, and I now no longer have access to NMR spectrometers since I've graduated.

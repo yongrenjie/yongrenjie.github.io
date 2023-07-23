@@ -1,8 +1,12 @@
 ---
 title: "yet another blog"
 listing:
-  contents: posts
-  sort: "date desc"
+  contents:
+    - "posts"
+    - "!posts/pulprog/part*.qmd"
+  sort:
+    - "date desc"
+    - "title desc"
   type: default
   categories: true
   sort-ui: false
@@ -10,5 +14,3 @@ listing:
 page-layout: full
 title-block-banner: true
 ---
-
-

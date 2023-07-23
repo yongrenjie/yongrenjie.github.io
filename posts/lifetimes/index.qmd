@@ -1,13 +1,13 @@
 ---
 title: "Lifetime annotations in Rust"
 date: 2023-06-19
+date-modified: 2020-06-20
 categories: [rust]
-engine: knitr
 ---
 
 *Disclaimer*: I don't actually write Rust for anything, and the following is *entirely* based on my interpretation of *one single paragraph in the Rust book*, so I may be completely wrong.
 
-(Edited 20 June after some discussion at work. Thanks to everyone who chimed in and helped me to understand this better!)
+(Edited after some discussion at work. Thanks to everyone who chimed in and helped me to understand this better!)
 
 ## Introduction
 
