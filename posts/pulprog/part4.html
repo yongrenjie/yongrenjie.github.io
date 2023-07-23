@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2023-03-01">
+<meta name="dcterms.date" content="2023-07-23">
 
-<title>𝑓𝑝 - Hi</title>
+<title>𝑓𝑝 - Pulse programming in TopSpin, part 4</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -98,6 +98,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&amp;family=Fira+Sans:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -139,9 +141,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Hi</h1>
+      <h1 class="title">Pulse programming in TopSpin, part 4</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">news</div>
+                <div class="quarto-category">nmr</div>
+                <div class="quarto-category">pulse programming</div>
               </div>
                   </div>
   </div>
@@ -153,7 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 1, 2023</p>
+        <p class="date">July 23, 2023</p>
       </div>
     </div>
     
@@ -171,17 +174,93 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Hello, world."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "Hello, world."</code></pre>
+<p>Here, we’re going to make some small but useful improvements to our first pulse programme: namely the inclusion of dummy scans, and some “special” comments for parameter descriptions.</p>
+<p><em>(This is part 4 of a series of posts on pulse programming in TopSpin. For the other parts, see the table of contents <a href="../../posts/pulprog/index.html">here</a>.)</em></p>
+<section id="making-a-new-version" class="level1">
+<h1>Making a new version</h1>
+<p>Before going on, let’s create a new version of your pulse programme. Open up the current pulse programme: you can either do this via the <code>edpul</code> interface, or you can use the <code>eda</code> command and click the three dots next to the pulse programme name. Then click <strong>File &gt; Save as…</strong>. Choose the same directory as the one you were previously in, and for the filename, <strong>append <code>.1</code> to your old filename</strong>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/saveas_new_pulprog.png" class="img-fluid figure-img" width="500"></p>
+<figcaption class="figure-caption">Creating a new pulse programme.</figcaption>
+</figure>
 </div>
+<p>In my case, this means my new filename is <code>jy_pulacq.1</code>, as in the screenshot above. It’s generally a good idea to create a new pulse programme whenever you’re trying to iteratively improve an existing pulse programme. A common way to indicate this in filenames is the <code>.&lt;N&gt;</code> suffix, where <code>N</code> is some kind of “version number”. You can see this strategy used in some of the Bruker standard pulse sequences.</p>
+<p>Once you hit <strong>OK</strong>, a window to edit the new pulse programme will appear. The key indicator is that the filename at the top bar will have changed. You should now modify the comment in the very first line to reflect this. Finally, press the <strong>Set PULPROG</strong> button to make this pulse programme the active one, so that the next time you run <code>zg</code> this pulse programme will be used.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/saveas_new_pulprog_1.png" class="img-fluid figure-img" width="350"></p>
+<figcaption class="figure-caption">Successfully creating a new pulse programme.</figcaption>
+</figure>
 </div>
-<p>Keeping a (technical) blog has been something I’ve thought of for quite a while. I’ve usually been held back by my uncertainty over why someone would ever want to read a technical blog by me: although I <em>know</em> plenty of things, I hardly have <em>in-depth</em> knowledge about anything, so I’ve always figured that there were people who were better at writing these things. There are already so many blogs out there, and I often feel that I don’t really want to add to the Huge Mess.</p>
-<p>But I somehow managed to sign myself up at <a href="https://www.turing.ac.uk/research-engineering">work</a> to make blog posts, so now I’ve got to do something. Now, at work, I’m probably going to be writing about machine learning basics, and that’s <em>hardly</em> a topic lacking on the Internet. But—I suppose, the one thing I do know a fair bit about is chemistry, since that’s what I’ve spent 8 years of my life studying. I post a lot about chemistry <a href="https://chemistry.stackexchange.com/users/16683/orthocresol?tab=answers&amp;sort=votes">elsewhere</a>, and on several occasions (in real life) I’ve had people tell me that they found my writeups useful.</p>
-<p>So, maybe I’ll intersperse my less-useful posts with some half-useful posts about chemistry…? And even if nobody reads it, this is probably useful for myself anyway!</p>
+</section>
+<section id="dummy-scans" class="level1">
+<h1>Dummy scans</h1>
+<p>In the <a href="../../posts/pulprog/part3.html">previous post</a>, we said that <em>dummy scans</em> were used to set the system to a steady state before running the experiment. For a simple 1D experiment like this one, it doesn’t really matter too much; but for other experiments you can actually get different results depending on how many dummy scans you use.</p>
+<p>Let’s set the <code>DS</code> parameter to 2, i.e.&nbsp;enable 2 dummy scans. Since <code>NS</code> is 2, when we set <code>DS</code> to 2, this should double the experiment duration. Our previous experiment took 8 seconds, so this should take 16 seconds. Check this with <code>expt</code>:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/expt_8sec.png" class="img-fluid figure-img" width="250"></p>
+<figcaption class="figure-caption">An experiment with an incorrect duration.</figcaption>
+</figure>
+</div>
+<p>Whoops! What went wrong?</p>
+<p>It turns out that the command <code>zd</code> which we previously used doesn’t “enable” the collection of dummy scans. In order to “turn this feature on”, we need to use the <code>ze</code> command instead.</p>
+<p>Change <code>zd</code> to <code>ze</code>, and near the top of your pulse programme, add a short comment to describe what changes you made in this version. If you haven’t done so already, click the <strong>Set PULPROG</strong> button. Re-run <code>expt</code> and make sure the duration has doubled. Then re-run the experiment with <code>zg</code>.</p>
+<p>In a 1D experiment, you probably almost always want to use <code>ze</code>. On the other hand, <code>zd</code> is quite useful in 2D spectra: we basically only want to run dummy scans at the <em>very</em> start of the experiment, instead of at the beginning of every <span class="math inline">\(t_1\)</span> increment. We’ll see why <code>zd</code> might be useful when we get to 2D spectra.</p>
+</section>
+<section id="parameter-descriptions" class="level1">
+<h1>Parameter descriptions</h1>
+<p>Type <code>ased</code> again to get to the pulse sequence parameter screen. You might have previously noticed that to the <em>right</em> of each parameter, there are some descriptions for them. But for <code>d1</code> and <code>p1</code>, the default descriptions are not very helpful:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/ased_unhelpful.png" class="img-fluid figure-img" width="450"></p>
+<figcaption class="figure-caption">Unhelpful parameter descriptions in the <code>ased</code> screen.</figcaption>
+</figure>
+</div>
+<p>When setting up a new experiment, it’s often useful to have some kind of hint as to what the pulses and delays mean. The good news is that by adding some “special” comments in the the pulse programme, we can specify a one-line description which will be displayed to users in the <code>ased</code> screen. These comments must go <em>below</em> the actual pulse sequence (i.e.&nbsp;after the <code>exit</code> command), and must be in the following form:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>;name : description</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Note that there can’t be any spaces between the first semicolon and the parameter name, or else it won’t be parsed correctly. (Spaces elsewhere are optional.) Let’s go ahead and add a few descriptions at the bottom of our pulse programme:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>;p1 : 90 degree pulse width (from getprosol)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>;pl1 : hard pulse power (from getprosol)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>;d1 : recovery delay (ca. 1 s)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Save the pulse programme and type <code>ased</code> again to refresh the screen. You should now see the new descriptions:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/ased_helpful.png" class="img-fluid figure-img" width="450"></p>
+<figcaption class="figure-caption">More helpful parameter descriptions.</figcaption>
+</figure>
+</div>
+<p>Incidentally, not <em>all</em> of the parameters can be specified in this way. Try it with <code>NS</code>, for example. You’ll find that you can’t override TopSpin’s default description for that.</p>
+</section>
+<section id="the-current-pulse-programme" class="level1">
+<h1>The current pulse programme</h1>
+<p>At this point, your pulse programme should look something like the following, perhaps with a few extra comments</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>; jy_pulacq.1</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>; pulse-acquire sequence</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>; Jonathan Yong, 5 July 2021</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>; .1 - enabled dummy scans by changing zd to ze</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>#include &lt;Avance.incl&gt;</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>ze</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>1 d1</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>(p1 ph1):f1</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>go=1 ph31 </span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>wr #0</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>exit</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>ph1 = 0 2</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>ph31 = 0 2</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>;p1 : 90 degree pulse width (from getprosol)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>;pl1 : hard pulse power (from getprosol)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>;d1 : recovery delay (ca. 1 s)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>When you’re ready, move on to the <a href="../../posts/pulprog/part5.html">next post</a>.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

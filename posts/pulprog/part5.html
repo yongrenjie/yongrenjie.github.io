@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2023-03-01">
+<meta name="dcterms.date" content="2023-07-23">
 
-<title>𝑓𝑝 - Hi</title>
+<title>𝑓𝑝 - Pulse programming in TopSpin, part 5</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -98,6 +98,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&amp;family=Fira+Sans:ital,wght@0,400;0,600;1,400;1,600&amp;display=swap" rel="stylesheet">
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
 </head>
@@ -139,9 +141,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Hi</h1>
+      <h1 class="title">Pulse programming in TopSpin, part 5</h1>
                                 <div class="quarto-categories">
-                <div class="quarto-category">news</div>
+                <div class="quarto-category">nmr</div>
+                <div class="quarto-category">pulse programming</div>
               </div>
                   </div>
   </div>
@@ -153,7 +156,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">March 1, 2023</p>
+        <p class="date">July 23, 2023</p>
       </div>
     </div>
     
@@ -171,17 +174,97 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(<span class="st">"Hello, world."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "Hello, world."</code></pre>
+<p>In this post, we’ll take a look at how we can modify and define parameters (such as pulse lengths) using mathematical expressions.</p>
+<p><em>(This is part 5 of a series of posts on pulse programming in TopSpin. For the other parts, see the table of contents <a href="../../posts/pulprog/index.html">here</a>.)</em></p>
+<section id="a-new-version" class="level1">
+<h1>A new version…</h1>
+<p>Before going on, use the <code>iexpno</code> command in TopSpin to create a new experiment with the next expno. All experimental parameters will be carried over from the previous experiment.</p>
+<p>Then, create a new version of your pulse programme with the suffix <code>.2</code>. The steps to do this are described in the <a href="../../posts/pulprog/part4.html">previous post</a>. Save the pulse programme, and make sure to hit <strong>Set PULPROG</strong>.</p>
+</section>
+<section id="changing-the-flip-angle" class="level1">
+<h1>Changing the flip angle</h1>
+<p>We previously mentioned that the flip angle <span class="math inline">\(\beta\)</span> is given by</p>
+<p><span class="math display">\[\beta = \omega_1 t_\mathrm{p}.\]</span></p>
+<p>As long as we keep <span class="math inline">\(\omega_1\)</span> (which is indirectly specified by <code>PLW1</code>) constant, then we can control the flip angle by changing <span class="math inline">\(t_\mathrm{p}\)</span>, which is <code>P1</code>.</p>
+<p>Let’s now change our pulse programme to use a 45° pulse instead of a 90° pulse. One way to do that would be to go into the <code>ased</code> screen and change <code>P1</code> to half of its original value. However, that would mean that when setting up the experiment, we can’t use <code>getprosol</code> (or we would have to divide it by 2 every time)!</p>
+<p>If we <em>always</em> want the flip angle to be 45°, then what we should do is to change the <em>pulse programme</em>. To be specific, we can change <code>p1</code> to <code>p1*0.5</code>, so that the line with the pulse now becomes</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>(p1*0.5 ph1):f1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Run the experiment. You should find that the spectrum is qualitatively very similar: not much has changed. But <em>quantitatively</em>, we expect that the 45° degree pulse will have created less transverse magnetisation than the 90°&nbsp;pulse (by a factor of <span class="math inline">\(\cos(45^\circ) \approx 0.71\)</span>).</p>
+<p>It’s hard to judge this by eye, but we can ascertain this by using TopSpin’s <em>multiple display</em> mode to superimpose two spectra. In the TopSpin command line, type <code>.md</code>, or click the appropriate button in the top panel (left is TopSpin 3, right TopSpin 4):</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/mult_disp.png" class="img-fluid figure-img" width="450"></p>
+<figcaption class="figure-caption">Finding multiple-display mode in TopSpin 3 (left) and 4 (right).</figcaption>
+</figure>
 </div>
+<p>Then, <em>drag</em> the original, first dataset from the left-hand sidebar into the main part of TopSpin:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/md_drag.png" class="img-fluid figure-img" width="450"></p>
+<figcaption class="figure-caption">Adding a new dataset to multiple display mode.</figcaption>
+</figure>
 </div>
-<p>Keeping a (technical) blog has been something I’ve thought of for quite a while. I’ve usually been held back by my uncertainty over why someone would ever want to read a technical blog by me: although I <em>know</em> plenty of things, I hardly have <em>in-depth</em> knowledge about anything, so I’ve always figured that there were people who were better at writing these things. There are already so many blogs out there, and I often feel that I don’t really want to add to the Huge Mess.</p>
-<p>But I somehow managed to sign myself up at <a href="https://www.turing.ac.uk/research-engineering">work</a> to make blog posts, so now I’ve got to do something. Now, at work, I’m probably going to be writing about machine learning basics, and that’s <em>hardly</em> a topic lacking on the Internet. But—I suppose, the one thing I do know a fair bit about is chemistry, since that’s what I’ve spent 8 years of my life studying. I post a lot about chemistry <a href="https://chemistry.stackexchange.com/users/16683/orthocresol?tab=answers&amp;sort=votes">elsewhere</a>, and on several occasions (in real life) I’ve had people tell me that they found my writeups useful.</p>
-<p>So, maybe I’ll intersperse my less-useful posts with some half-useful posts about chemistry…? And even if nobody reads it, this is probably useful for myself anyway!</p>
+<p>TopSpin will now show you both datasets together, superimposed. Verify that the second dataset (with the 45° pulse) has a lower intensity than the first. (If you’re not familiar with this mode, it’s a good idea to also have a play around with the row of buttons at the top to see what you can do with them.) When you’re done, type <code>.ret</code> into the TopSpin command line, or click the right-most “return” button which looks like an arrow (boxed above).</p>
+</section>
+<section id="a-user-defined-flip-angle" class="level1">
+<h1>A user-defined flip angle</h1>
+<p>Now, we have hardcoded a flip angle inside our pulse programme: anybody who uses this will end up with a 45° pulse (as long as their <code>p1</code> corresponds to a 90° pulse, which it almost certainly will). But perhaps we should like to let the user choose their own flip angle. Parameters like these, which are neither pulses (the <code>P</code> family) nor delays (the <code>D</code> family), can be specified as <em>constants</em> (<code>CNST</code>). TopSpin allows you to specify constants ranging from <code>CNST0</code> to <code>CNST63</code>.</p>
+<p>First, let’s change the hardcoded <code>p1*0.5</code> to just <code>p0</code>, where <code>p0</code> is going to be the pulse width that we end up with. (Recall that <code>p1</code> is always the 90°&nbsp;pulse, which is why we’re using a different number here.) Suppose our flip angle is specified as <code>CNST1</code> in degrees. <strong>Then, the following relationship must hold: <code>p0 = p1 * cnst1 / 90</code>.</strong></p>
+<p>In order to <em>enforce</em> this relationship, we can add it as a line before the pulse programme begins (i.e.&nbsp;before <code>ze</code>). <strong>Definitions such as these must be enclosed in double quotes.</strong> So, add the following line before the <code>ze</code> line:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>"p0 = p1 * cnst1 / 90"</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>(Perhaps now is a good time to add some comments at the bottom of the file to explain what <code>p0</code> and <code>cnst1</code> are, so that the user can see it in the <code>ased</code> file!)</p>
+<p>Our pulse programme should now look something like the following:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>; jy_pulacq.2</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>; pulse-acquire sequence</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>; Jonathan Yong, 5 July 2021</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>; .1 - enabled dummy scans by changing zd to ze</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>; .2 - enable variable flip angle through cnst1</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>#include &lt;Avance.incl&gt;</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>"p0 = p1 * cnst1 / 90"</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>ze</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>1 d1</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>(p0 ph1):f1</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>go=1 ph31</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>wr #0</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>exit</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>ph1 = 0 2</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>ph31 = 0 2</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>;p1    : 90 degree pulse width (from getprosol)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>;pl1   : hard pulse power (from getprosol)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>;p0    : X degree pulse width</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>;cnst1 : flip angle in degrees</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>;d1    : recovery delay (ca. 1 s)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>and the <code>ased</code> screen should be similar to this:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/ased_variable_fa.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">New <code>ased</code> screen with a variable flip angle.</figcaption>
+</figure>
+</div>
+<p>While in this screen, you should set <code>cnst1</code> to several different values. Notice how every time you change <code>cnst1</code>, the value of <code>p0</code> is automatically updated: this is a result of the relationship that we specified. The result of our work is that:</p>
+<ul>
+<li>The user can <em>always</em> get <code>p1</code> and <code>pl1</code> using <code>getprosol</code>, and need not adjust it manually themselves.</li>
+<li>The flip angle can be chosen at will by setting <code>cnst1</code>.</li>
+<li>The pulse programme automatically calculates the correct pulse width corresponding to the user’s chosen flip angle.</li>
+</ul>
+<p>Actually, if you just want to see or modify the value of one parameter, you don’t have to go to the <code>ased</code> screen and wade through the entire list. You can directly type <code>cnst1</code> into the TopSpin command line, and TopSpin will show you a dialog box containing the current value of <code>cnst1</code>. If you want to change it, you can then enter a new value there.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="img/cnst1.png" class="img-fluid figure-img" width="200"></p>
+<figcaption class="figure-caption">Directly modifying <code>cnst1</code> from the TopSpin command line.</figcaption>
+</figure>
+</div>
+<p>Play around with this a bit: create a few different experiments with the <code>iexpno</code> command, and run each with different flip angles between (say) 0° and 360°. Then use multiple-display mode (<code>.md</code>) to compare the resulting spectra. You can even integrate the spectrum and plot the intensity as a function of the flip angle (it should have a sine profile).</p>
+<p>When you’re ready, move on to the <a href="../../posts/pulprog/part6.html">next post</a>, where we’ll introduce a more advanced topic: pulsed field gradients.</p>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
