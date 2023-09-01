@@ -9,7 +9,7 @@ Part of my current job involves [web app development](https://alan-turing-instit
 One of the more fiddly things I did was to create buttons to move between different 'scenarios', and have their descriptions fly in/off the screen.
 This is what it looks like:
 
-<div align="center"><video controls src="demoland.mp4" width="300"></video></div>
+<video controls src="demoland.mp4" width="300"></video>
 
 This series of blog posts serves to document the steps I took to create this effect.
 
@@ -96,7 +96,7 @@ Right now, what we have (in the code above) is very standard Svelte code and beh
 There is a dropdown to choose the novel, and also left/right buttons to navigate between them.
 The arrow buttons are disabled when we reach either the start or the end of the list of novels.
 
-<div align="center" style="margin-left:auto; margin-right:auto"><video controls src="novels1.mp4" width="300"></video></div>
+<video controls src="novels1.mp4" width="300"></video>
 
 
 ## Transitions 101: the DOM
@@ -148,7 +148,7 @@ So, we need to explicitly set `x` to 500: this means that the element moves 500 
 
 It looks like this:
 
-<div align="center" style="margin-left:auto; margin-right:auto"><video controls src="novels2.mp4" width="450"></video></div>
+<video controls src="novels2.mp4" width="450"></video>
 
 To get the current version of the code, run `git checkout 2-fly`.
 
@@ -163,16 +163,25 @@ To do this, we need to specify different transitions using `in` and `out`.
 </p>
 ```
 
-<div align="center" style="margin-left:auto; margin-right:auto"><video controls src="novels3.mp4" width="450"></video></div>
+<video controls src="novels3.mp4" width="450"></video>
 
 To get the current version of the code, run `git checkout 3-inout`.
 
+# Where are we?
+
+At this point, there are three issues that we need to fix (in order of increasing difficulty):
+
+1. **Overflow**  
+   When entering/exiting, the paragraphs overflow the boundaries of their containing `div`.
+   We'd like to make sure they aren't visible outside of the inner purple div.
+1. **Direction**  
+   When clicking the right-arrow button, the direction of the transition looks correct; but when clicking the left-arrow button, we'd like the transitions to happen in the _other_ direction (i.e. exit to the right, come in from the left).
+1. **Height**  
+   The exiting paragraph maintains its height until the transition ends, meaning that the incoming paragraph comes in _below_ it and then suddenly jumps to the top.
+
 ## Overflow
 
-Another obvious issue is that when entering/exiting, the paragraphs overflow the boundaries of their containing `div`.
-We'd like to make sure they aren't visible outside of the inner purple div.
-
-This is also easy to fix, by setting `overflow-x: hidden` to the inner purple div:
+This one is fairly easy to fix, by setting `overflow-x: hidden` on the inner purple div:
 
 ```{.css}
 div#middle {
@@ -185,13 +194,6 @@ Note that we don't set this on the `p` element itself.
 This is because the `p` element always resizes to contain all of its contents (i.e., the text).
 We're not concerned about the _text_ overflowing its `p` container; we're concerned about the _purple `div`_ leaking its contents outside.
 
+<video controls src="novels4.mp4" width="450"></video>
+
 To get the current version of the code, run `git checkout 4-overflow`.
-
-## Direction
-
-1. **Direction**  
-   When clicking the right-arrow button, the direction of the transition looks correct; but when clicking the left-arrow button, we'd like the transitions to happen in the _other_ direction (i.e. exit to the right, come in from the left).
-1. **Height**  
-   The exiting paragraph maintains its height until the transition ends, meaning that the incoming paragraph comes in _below_ it and then suddenly jumps to the top.
-
-To prevent this post from getting too long, I will turn each of these issues into the subject of a separate blog post.

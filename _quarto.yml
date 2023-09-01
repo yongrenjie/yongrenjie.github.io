@@ -15,6 +15,7 @@ format:
     css: styles.css
     mainfont: Fira Sans
     monofont: Fira Code
+    embed-resources: true
     linestretch: 1.7
     header-includes: |
       <link rel="preconnect" href="https://fonts.googleapis.com">
