@@ -1,0 +1,197 @@
+---
+title: "Local fly transitions with Svelte"
+date: 2023-08-31
+categories: [svelte]
+engine: knitr
+---
+
+Part of my current job involves [web app development](https://alan-turing-institute.github.io/demoland-web) using Svelte and TypeScript.
+One of the more fiddly things I did was to create buttons to move between different 'scenarios', and have their descriptions fly in/off the screen.
+This is what it looks like:
+
+<div align="center"><video controls src="demoland.mp4" width="300"></video></div>
+
+This series of blog posts serves to document the steps I took to create this effect.
+
+## Setting it up
+
+To begin, we'll create a minimal working example.
+Instead of stuff from my real project, I'll use the opening paragraphs of a bunch of novels.
+
+If you want to follow along, grab a copy of the code and start a development server with the following commands:
+
+```{.bash}
+git clone git@github.com:yongrenjie/localfly-code.git
+git checkout 0-initial
+cd localfly-code
+npm install
+npx vite
+```
+
+To set up this repository, I did the following:
+
+1. Install Node.js. Run `npm init vite@latest` and select Svelte / TypeScript at the prompts.
+2. Run `npm install` and `npx vite` to start the dev server.
+3. Inside the `src` directory, and get rid of `app.css` as well as the `assets` and `lib` folder. Remove the import of `app.css` inside `main.ts` as well.
+4. Replace the contents of the `App.svelte` file with this:
+
+```{.html code-line-numbers="true"}
+<script lang="ts">
+    let novels = [
+        {title: "Emma", opening: "Emma Woodhouse, handsome, clever, and rich, with a comfortable home and happy disposition, seemed to unite some of the best blessings of existence; and had lived nearly twenty-one years in the world with very little to distress or vex her."},
+        {title: "The Great Gatsby", opening: "In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since."},
+        {title: "Mrs Dalloway", opening: "Mrs Dalloway said she would buy the flowers herself."},
+        {title: "The Catcher in the Rye", opening: "If you really want to hear about it, the first thing you'll probably want to know is where I was born, and what my lousy childhood was like, and how my parents were occupied and all before they had me, and all that David Copperfield kind of crap, but I don't feel like going into it, if you want to know the truth."}
+    ];
+
+    let index = 0;
+    function nextNovel() {
+        index = index + 1;
+    }
+    function previousNovel() {
+        index = index - 1;
+    }
+</script>
+
+<main>
+    <div id="middle">
+        <div id="controls">
+            <button on:click={previousNovel} disabled={index === 0}>←</button>
+            <select bind:value={index}>
+                {#each novels as novel, i}
+                    <option value={i}>{novel.title}</option>
+                {/each}
+            </select>
+            <button on:click={nextNovel} disabled={index === novels.length - 1}>→</button>
+        </div>
+        <p id="opening">{novels[index].opening}</p>
+    </div>
+</main>
+
+<style>
+    main {
+        display: flex;
+        justify-content: center;
+        background-color: #ffe6f4;
+        padding: 20px;
+    }
+    div#middle {
+        background-color: #fcbaff;
+        border: 2px solid #e688eb;
+        padding: 10px;
+        width: 300px;
+    }
+    div#controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+    }
+    p#opening {
+        margin-bottom: 0;
+    }
+</style>
+```
+
+Right now, what we have (in the code above) is very standard Svelte code and behaviour.
+There is a dropdown to choose the novel, and also left/right buttons to navigate between them.
+The arrow buttons are disabled when we reach either the start or the end of the list of novels.
+
+<div align="center" style="margin-left:auto; margin-right:auto"><video controls src="novels1.mp4" width="300"></video></div>
+
+
+## Transitions 101: the DOM
+
+Svelte already provides a bunch of transitions "out of the box", which are very customisable.
+(See, e.g., the [tutorial](https://svelte.dev/tutorial/transition), or the [full docs](https://svelte.dev/docs/svelte-transition).)
+Here, we're going to use the `fly` transition.
+
+However, we can't just apply the transition to the `p` element containing the opening paragraph.
+The reason is because transitions are applied to elements which are being added or removed from the DOM.
+In this case, the `p` element isn't actually being added or removed when we change the novel; we're merely changing its contents.
+
+The way I got around this was to create one `p` element for each novel's opening paragraph, but only include it in the DOM if it's the novel that we want.
+
+Replace the `p` element with this:
+
+```{.html}
+{#each novels as novel, i}
+    {#if i === index}
+        <p id="opening">{novel.opening}</p>
+    {/if}
+{/each}
+```
+You should see the same effect as before.
+The difference, though, is that each opening paragraph is now in its own `p` element.
+When we change the novel, the corresponding `p` element is removed from the DOM, and a new one is added.
+
+To get the current version of the code, run `git checkout 1-dom`.
+Because of Vite's hot module replacement wizardry, you can even do this while the dev server is still running, and you don't have to refresh the web page to see the changes!
+
+## Adding fly
+
+Now, we can add a transition.
+The following import needs to go in the TypeScript section:
+
+```{.ts}
+import { fly } from "svelte/transition";
+```
+
+and then we add a `transition` directive to the `p` element.
+On its own, the `fly` transition doesn't actually move things.
+So, we need to explicitly set `x` to 500: this means that the element moves 500 pixels to the right before disappearing fully (for an outro transition), or comes in from 500 pixels to the right (for an intro).
+
+(You can also set `y` to move things vertically. The reason why `fly` doesn't move things on its own is because the default values of `x` and `y` are both 0.)
+
+```{.html}
+<p id="opening" transition:fly={{ x: 500 }}>{novel.opening}</p>
+```
+
+It looks like this:
+
+<div align="center" style="margin-left:auto; margin-right:auto"><video controls src="novels2.mp4" width="450"></video></div>
+
+To get the current version of the code, run `git checkout 2-fly`.
+
+## In and out
+
+One very, very easy way to improve this is to make the outro transition go in the opposite direction of the intro one.
+To do this, we need to specify different transitions using `in` and `out`.
+
+```{.html}
+<p id="opening" in:fly={{ x: 500 }} out:fly={{ x: -500 }}>
+    {novel.opening}
+</p>
+```
+
+<div align="center" style="margin-left:auto; margin-right:auto"><video controls src="novels3.mp4" width="450"></video></div>
+
+To get the current version of the code, run `git checkout 3-inout`.
+
+## Overflow
+
+Another obvious issue is that when entering/exiting, the paragraphs overflow the boundaries of their containing `div`.
+We'd like to make sure they aren't visible outside of the inner purple div.
+
+This is also easy to fix, by setting `overflow-x: hidden` to the inner purple div:
+
+```{.css}
+div#middle {
+    /* ... other styling */
+    overflow-x: hidden;
+}
+```
+
+Note that we don't set this on the `p` element itself.
+This is because the `p` element always resizes to contain all of its contents (i.e., the text).
+We're not concerned about the _text_ overflowing its `p` container; we're concerned about the _purple `div`_ leaking its contents outside.
+
+To get the current version of the code, run `git checkout 4-overflow`.
+
+## Direction
+
+1. **Direction**  
+   When clicking the right-arrow button, the direction of the transition looks correct; but when clicking the left-arrow button, we'd like the transitions to happen in the _other_ direction (i.e. exit to the right, come in from the left).
+1. **Height**  
+   The exiting paragraph maintains its height until the transition ends, meaning that the incoming paragraph comes in _below_ it and then suddenly jumps to the top.
+
+To prevent this post from getting too long, I will turn each of these issues into the subject of a separate blog post.
